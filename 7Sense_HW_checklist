@@ -2,11 +2,13 @@ Hardware checklist
 ===================
 
 This is a document to describe the process of
-hardware design within 7Sense Technologies AS.
+hardware design internally at 7Sense Technologies AS.
 
-It is both a checklist to reveal lack of planning, 
+It is both a checklist and a review-procedure document,
+aiming not only to reveal lack of planning, 
 missing steps in design flow and other discrepancies, 
-but also (hopefully) an aid to provide good design methodology.
+but also (hopefully) provide help in the process of 
+enforcing good design methodology.
 
 
 Design review
@@ -129,6 +131,7 @@ d) is usage of peripheral devices (e.g. mode, speed etc.) kept exactly the same?
 e) was exactly same levels on I/Os used?
 f) was exactly same connectors used?
 
+
 Design partitioning and modularization:
 
 2) Was Power-supply design made modular?
@@ -205,9 +208,41 @@ c) both
 6) Was networking-subsystem design made modular?
 If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
 
-If YES to above, fill out section 4.1, 4.2 and 4.3! 
+If YES to above, fill out section 6.1, 6.2 and 6.3! 
 
 
+Environment constraints:
+
+7) Operational range
+a) Has temperature range been specified? Specify Ta(min)/Ta(max) in [C]:
+b) Has pressure range been specified? Specify Pa(min)/Pa(max) in [Bar]:
+c) Has moisture range been specified? Specify Hg(min)/Hg(max) in [%]:
+
+
+
+Schematic design & implementation
+----------------------------------
+This section cannot be filled out until the 
+previous sections are completed, and agreed upon by 
+team leader and reviewer(s)!
+
+1) Schematic construction
+List named, functional blocks in the design:
+a) are all functional blocks present as separate blocks in schematic?
+b) are all functional blocks drawn with easily identifiable I/O ports, where symbol gives direction?
+c) are all signal nets attached to a testpoint labeled "TP<n>" (n=testpoint number)?
+d) does differential analog signal-pairs or balanced digital I/Os have a testpoint-pair 
+   attached as closely to each other - and optionally to the driver - as possible?
+e) are all supply-nets attached to at least one testpoint?
+f) is there a pin or fixture in the schematic for easy connection to signal GND?
+g) are all input terminals placed on the left side of schematic / each sub-schematic?
+h) are all output terminals placed on the right side of schematic / each sub-schematic?
+i) are all (passive) component tolerances given in schematic wherever non-default?
+j) are a default tolerance value given for each type of (passive) components?
+
+2) Schematic design output
+a) are a automated BOM produced from the schematic
+b) 
 
 PCB design & implementation
 ----------------------------
@@ -237,7 +272,17 @@ d) Complexity (# of nets):
 e) Longest net in [mm]:
 f) (Estimated) highest frequency on any net in [Hz]:
 
+3) PCB layout verification
+a) Has netlist extraction & automated comparison with schematic been performed?
+b) has parasitics extraction & automated back-annotation of netlist been performed?
+c) has design-rules check (DRC) been performed on layout?
+d) has alignment structures been incorporated in layout?
+f) has 3D model of PCB been created, with all components included?
+g) has 3D model of mechanics been created, and integrated with 3D model of PCB w. components?
+h) has access to all connectors been verified?
 
+4) PCB design completion
+a) Are silkscreen  
 
 
 
