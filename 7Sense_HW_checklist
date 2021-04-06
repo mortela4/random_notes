@@ -45,18 +45,21 @@ If YES, add reference:
 If NO, give rationale:
 b) What type of components does the design contain?
 Check all that applies:
-* Power, including modules (excluding internal power-supply/supplies). Describe voltage(s) and current output in [A] (e.g. 400V/10A):
-* MCU, including modules. Provide full partnumber(s) or optionally base partnumber if multiple pin-comatibles:
-* MPU/CPU (or SoC), including modules. Provide full partnumber(s) or optionally base partnumber if multiple pin-compatibles:
+* Power, including modules. Describe voltage(s) and current output in [A] (e.g. 400V/10A):
+* Frequency-control, including modules. Describe type(s) and frequency/frequencies:
+* MCU, including modules. Provide description (architecture and internal memories), full partnumber(s) or optionally base partnumber if multiple pin-compatibles:
+* MPU/CPU (or SoC), including modules. Provide description (architecture and internal memories), full partnumber(s) or optionally base partnumber if multiple pin-compatibles:
 * FPGA/PLD, including modules. Provide full partnumber(s) or optionally base partnumber or product family if multiple pin-compatibles:
 * RF (including Bluetooth/BLE). Provide frequency/frequencies in [Hz], and protocol (if any), along with full partnumber(s) or optionally base partnumber or product family if multiple pin-compatibles:
 * Display. Type or standard:
 * Wired networking. Type or standard:
 * Wireless networking. Type or standard:
-* Storage. Type or standard:
+* Memories/storage. Type and optionally standard/product-family(indicates 2.source exist):
 * Sensors. Type(s):
 * Other types regarded as of importance. List what types:
 
+NOTE: if none of the above component types are checked, 
+the design is assumed to consist solely of connectors, signal routing and/or passive components!
 
 
 Design tools and procedures
@@ -163,13 +166,16 @@ c) pin-header, non-standard pinout
 d) pin-header, w. standardized pinout. Reference to standard:
 e) board connector, non-standard pinout
 f) board connector, w. standardized pinout. Reference to standard:
+g) backplane (i.e. 'rack') connector, non-standard pinout
+h) backplane (i.e. 'rack') connector, w. standardized pinout. Reference to standard:
 Rationale for chosen implementation:
 
 4.3) Computing-subsystem partitioning design-goals
 Select ONE of the following:
 a) computing module to be re-used
 b) carrier-board to be re-used
-c) both
+c) both module and carrier-board designed for re-use
+d) multiple, connected but replaceable computing units
 
 
 5) Was RF-subsystem design made modular?
@@ -196,6 +202,40 @@ b) carrier-board to be re-used
 c) both
 
 
+6) Was networking-subsystem design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, fill out section 4.1, 4.2 and 4.3! 
+
+
+
+PCB design & implementation
+----------------------------
+This section cannot be filled out until the 
+previous sections are completed, and agreed upon by 
+team leader and reviewer(s)!
+
+1) PCB characteristics
+a) type of material:
+b) # of layers:
+   Which is sum of
+   - # of Vcc layers:
+   - # of GND layers:
+   - # of signal layers:
+   - # of other layers:
+   NOTE: specify as signal layers if Vcc and signal routed on same layer!
+c) copper thickness(es):
+d) type of post-processing (e.g. filling, surface processing etc.): 
+   NOTE: specify "none" if no post-processing is expected!
+e) dimensions w/o components as L(max)/H(max)/W(max):
+
+2) PCB layout
+a) Standards compliance (e.g. IPC-std. etc.):
+b) Design-rules used ("none" if NOT applicable):
+c) Symbol library/libraries used:
+d) Complexity (# of nets):
+e) Longest net in [mm]:
+f) (Estimated) highest frequency on any net in [Hz]:
 
 
 
