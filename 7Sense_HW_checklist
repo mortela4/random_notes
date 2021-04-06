@@ -1,0 +1,209 @@
+Hardware checklist
+===================
+
+This is a document to describe the process of
+hardware design within 7Sense Technologies AS.
+
+It is both a checklist to reveal lack of planning, 
+missing steps in design flow and other discrepancies, 
+but also (hopefully) an aid to provide good design methodology.
+
+
+Design review
+-------------
+1) Is project internal, or for external customer?
+
+2) how is design planned
+- from written specifications, provided by customer?
+- from written specifications, 
+  * if (any) YES, provide reference(s)!
+
+2) how is the design implemented?
+- based on reference design?
+- input from software engineers
+- design from scratch
+
+3) is a block schematic provided?
+- if NO give rationale
+
+4) is a design interpretation presented?
+- if NO give rationale
+- if YES, is the interpretation recorded and accepted by team leader (and optionally the team)?
+
+5) Is a test-strategy provided?
+- if NO give rationale
+- if YES, 
+a) is the interpretation recorded and accepted by team leader (and optionally the team)?
+b) does the test-stragegy involve (check all YES/NO)
+* BIT (i.e. automated or semi-automated HW-test). Name type (e.g. bed-of-nails, JTAG) or method:
+* BIST (i.e. automated HW self-test). Name type (e.g. ROM code) or method:
+* manual procedures. Specify method:
+
+6) Overall project description.
+a) Is a project design-description provided?
+If YES, add reference:
+If NO, give rationale:
+b) What type of components does the design contain?
+Check all that applies:
+* Power, including modules (excluding internal power-supply/supplies). Describe voltage(s) and current output in [A] (e.g. 400V/10A):
+* MCU, including modules. Provide full partnumber(s) or optionally base partnumber if multiple pin-comatibles:
+* MPU/CPU (or SoC), including modules. Provide full partnumber(s) or optionally base partnumber if multiple pin-compatibles:
+* FPGA/PLD, including modules. Provide full partnumber(s) or optionally base partnumber or product family if multiple pin-compatibles:
+* RF (including Bluetooth/BLE). Provide frequency/frequencies in [Hz], and protocol (if any), along with full partnumber(s) or optionally base partnumber or product family if multiple pin-compatibles:
+* Display. Type or standard:
+* Wired networking. Type or standard:
+* Wireless networking. Type or standard:
+* Storage. Type or standard:
+* Sensors. Type(s):
+* Other types regarded as of importance. List what types:
+
+
+
+Design tools and procedures
+---------------------------
+
+Tools:
+
+1) list tools and versions thereof used for design
+
+2) list tools and versions thereof used for verification
+
+3) list and describe manual procedures used in design and verification, 
+   especially cases where tools were not sufficient
+
+4) Describe type and format of design-handoff deliverables (BOM etc.):
+
+
+Design flow:
+
+1) schematic properties
+a) are pin properties used? (YES/consistently, Partially, NO/excluded)
+If YES, specify pin property types:
+- direction --> out, in, bidirectional
+- type --> open-drain/source, CMOS(Rail-to-Rail), TTL, LVDS, analog, dedicated(e.g. USB) etc.
+- fanout --> constrained(1:1/1:N = number of 'characterisic loads' - specify capacitance or current-drive), dedicated(Tx/Rx-pair) etc.
+- drive --> [x]mA sink/source, SlewRate, Schmitt-trigger input, tristatable(OUTput) etc.
+- I/O-voltage --> [V]-standard, multi-drive(given by Vdd_io) or range(specify Vhi(min), Vhi(max))
+- STATIC (connected to Vcc or GND, directly or thorugh pull-up/down) or DYNAMIC(optionally specify max. switching frequency)
+b) other constraints used (specify!) --> e.g. connection required, conditionally required or optional
+
+2) Rules checking
+a) what types of DRC and/or ERC have been conducted?
+- connectivity check (= "all nets connected?")
+- I/O integrity 
+  * no two outputs connected to each other, unless open drain or open-source or bidirectional 
+  * pull-up/down where required --> have all INputs been analyzed for static level forcing?
+- voltage compatibility --> OUTput connected to INput of same or compatible I/O voltage level and/or signalling type
+
+3) Simulation & formal verification
+a) were complete, functional simulation of design performed?
+b) if YES to above
+- add reference to simulation results/output here:
+- specify TYPE of simulation: (analog, digital, both(separate) or co-sim/mixed-signal)
+c) if NO to above, specify what part(s) were simulated:
+* Power Supply/supplies
+* analog part of design
+* digital part of design 
+* other (specify):
+d) S-parameters extracted & analyzed, or critical nets verified as (2E8[m/s] / fmax) > 2*L ?
+
+
+
+Design implementation
+---------------------
+
+Design foundation:
+
+1) If a reference design was used (see: HW Design Review, part 1),
+indicate if the following procedures followed:
+a) pinout (i.e. GPIOs) of programmable device (MCU, CPU/SoC, FPGA/PLD or similar) re-used -
+i.e. exactly the same?
+b) PCB layout exactly the same (i.e. copied from design files)?
+- if NO to above, were PCB layout of critical nets kept exactly the same?
+c) peripheral devices (e.g. memories, transceivers, power-supply devices etc.) kept exactly the same?
+d) is usage of peripheral devices (e.g. mode, speed etc.) kept exactly the same?
+- if NO to above, was peripheral device used in another mode or at another speed?
+e) was exactly same levels on I/Os used?
+f) was exactly same connectors used?
+
+Design partitioning and modularization:
+
+2) Was Power-supply design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, specify if supply (or supplies) is/are implemented  
+a) as custom-designed module?
+b) with COTS module(s)?
+If YES to b), specify product(s):
+
+2.1) Give rationale for choice above:
+
+3) Was any off-chip memories (RAM, Flash etc.) used?
+If YES, was this in the form of
+a) discrete design?
+b) standard module (e.g. DIMM, SDcard, M.2 etc.)?
+If YES to b), specify type and/or specific product(s):
+
+3.1) Give rationale for choice above:
+
+
+4) Was computing-subsystem design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, fill out section 4.1, 4.2 and 4.3! 
+
+4.1) specify if MCU/CPU/SoC/FPGA subsystem(s) is/are implemented  
+a) as custom-designed module? Specify IC device(s):
+b) with COTS module(s)? Specify product(s) and standard (e.g. OSM from sget.org):
+
+4.2) specify connectivity of computing module
+a) solderable, non-standardized
+b) solderable, non-standardized. Reference to standard:
+c) pin-header, non-standard pinout
+d) pin-header, w. standardized pinout. Reference to standard:
+e) board connector, non-standard pinout
+f) board connector, w. standardized pinout. Reference to standard:
+Rationale for chosen implementation:
+
+4.3) Computing-subsystem partitioning design-goals
+Select ONE of the following:
+a) computing module to be re-used
+b) carrier-board to be re-used
+c) both
+
+
+5) Was RF-subsystem design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, fill out section 5.1 and 5.2! 
+5.1) specify if RF subsystem(s) is/are implemented  
+a) as custom-designed module? Specify IC device(s):
+b) with COTS module(s)? Specify product(s) and standard (e.g. Arduino-type expansion board, mPCIE module etc.):
+
+4.2) specify connectivity of RF module
+a) solderable, non-standardized
+b) solderable, non-standardized. Reference to standard:
+c) pin-header, non-standard pinout
+d) pin-header, w. standardized pinout. Reference to standard:
+e) board connector, non-standard pinout
+f) board connector, w. standardized pinout. Reference to standard:
+Rationale for chosen implementation:
+
+4.3) RF-subsystem partitioning design-goals
+Select ONE of the following:
+a) RF module to be re-used
+b) carrier-board to be re-used
+c) both
+
+
+
+
+
+
+
+
+
+
+
+
+
