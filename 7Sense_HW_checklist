@@ -10,9 +10,19 @@ missing steps in design flow and other discrepancies,
 but also (hopefully) provide help in the process of 
 enforcing good design methodology.
 
+Note that this is an INTERNAL document, 
+NOT a deliverable! It's target audience is primarily 
+fellow HW & SW developers within 7Sense, 
+not staff at contract manufacturers or external customers. 
+This implies that content is adapted for those who are 
+tasked with interpreting, comprehending and using the HW design.
+Some points regarding PCB-specific characteristics are included, 
+but a separate document shall be used for reviewing a design 
+for 'manufacturing-readiness'.  
+
 
 Design review
--------------
+--------------
 1) Is project internal, or for external customer?
 
 2) how is design planned
@@ -234,15 +244,16 @@ c) are all signal nets attached to a testpoint labeled "TP<n>" (n=testpoint numb
 d) does differential analog signal-pairs or balanced digital I/Os have a testpoint-pair 
    attached as closely to each other - and optionally to the driver - as possible?
 e) are all supply-nets attached to at least one testpoint?
-f) is there a pin or fixture in the schematic for easy connection to signal GND?
+f) is there at least one pin or fixture in the schematic for easy connection to signal GND?
 g) are all input terminals placed on the left side of schematic / each sub-schematic?
 h) are all output terminals placed on the right side of schematic / each sub-schematic?
 i) are all (passive) component tolerances given in schematic wherever non-default?
 j) are a default tolerance value given for each type of (passive) components?
 
 2) Schematic design output
-a) are a automated BOM produced from the schematic
-b) 
+a) is an automated BOM produced from the schematic?
+b) is a PDF of the schematic in color produced, with search capability?
+
 
 PCB design & implementation
 ----------------------------
@@ -282,7 +293,13 @@ g) has 3D model of mechanics been created, and integrated with 3D model of PCB w
 h) has access to all connectors been verified?
 
 4) PCB design completion
-a) Are silkscreen  
+a) Are silkscreen containing all testpoint labels?
+If NO, list which are missing:
+b) Are silkscreen indicating connector orientation and pinning? 
+NOTE: that is, preferably all pin numbers as labels, minimum pin#1.
+
+
+
 
 
 
