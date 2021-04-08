@@ -1,6 +1,8 @@
 Hardware checklist
 ===================
 
+Introduction
+-------------
 This is a document to describe the process of
 hardware design internally at 7Sense Technologies AS.
 
@@ -19,6 +21,8 @@ tasked with interpreting, comprehending and using the HW design.
 Some points regarding PCB-specific characteristics are included, 
 but a separate document shall be used for reviewing a design 
 for 'manufacturing-readiness'.  
+
+
 
 
 Design review
@@ -92,14 +96,28 @@ Tools:
 Design flow:
 
 1) schematic properties
-a) are pin properties used? (YES/consistently, Partially, NO/excluded)
+a) are PIN properties used? (YES/consistently, Partially, NO/excluded)
 If YES, specify pin property types:
-- direction --> out, in, bidirectional
+- direction --> out, in, bidirectional (applies both to ICs and connectors)
 - type --> open-drain/source, CMOS(Rail-to-Rail), TTL, LVDS, analog, dedicated(e.g. USB) etc.
 - fanout --> constrained(1:1/1:N = number of 'characterisic loads' - specify capacitance or current-drive), dedicated(Tx/Rx-pair) etc.
 - drive --> [x]mA sink/source, SlewRate, Schmitt-trigger input, tristatable(OUTput) etc.
 - I/O-voltage --> [V]-standard, multi-drive(given by Vdd_io) or range(specify Vhi(min), Vhi(max))
 - STATIC (connected to Vcc or GND, directly or thorugh pull-up/down) or DYNAMIC(optionally specify max. switching frequency)
+b) are NET properties used? (YES/consistently, Partially, NO/excluded)
+If YES, specify net property types:
+- current load 
+- characteristic impedance (within min/max) at given frequency or frequency range
+- coupling w. other nets (e.g. differential, balanced signaling)
+- HV isolation (isolation voltage in [V], minimum resistance between given net(s), or air-gap distance)
+NOTE: net properties should ideally propagate to PCB layout tool! 
+If this is NOT the case, and PCB-layout tool itself has no verification mechanisms, 
+PCB layout shall either
+- be extracted as back-annotated netlist with parasitics (R,L,C) and verified using simulation tool,
+   or imported into schematic capture tool and verified there 
+- or manually verified, using analytical methods (e.g. calculate worst-case propagation delay from PCB trace lengths) 
+  or direct comparison (e.g. air-gap distances), with written digressions for those nets where properties were set in schematic,
+  and supplied with a rationale for acceptance.
 b) other constraints used (specify!) --> e.g. connection required, conditionally required or optional
 
 2) Rules checking
@@ -112,16 +130,22 @@ a) what types of DRC and/or ERC have been conducted?
 
 3) Simulation & formal verification
 a) were complete, functional simulation of design performed?
-b) if YES to above
+b) if YES to above 
 - add reference to simulation results/output here:
-- specify TYPE of simulation: (analog, digital, both(separate) or co-sim/mixed-signal)
+- specify TYPE of simulation (analog, digital, both(separate) or co-sim/mixed-signal):
 c) if NO to above, specify what part(s) were simulated:
 * Power Supply/supplies
 * analog part of design
 * digital part of design 
+  Specify type:
+  * digital only, type PLC (ladder program or similar)
+  * digital only, type HDL
+  * Mixed HDL + SW co-simulation
+  * true mixed-signal (e.g. HDL+AHDL, HDL+Spice co-sim. etc.)
 * other (specify):
 d) S-parameters extracted & analyzed, or critical nets verified as (2E8[m/s] / fmax) > 2*L ?
-
+e) EMC simulation performed?
+f) EMI simulation performed?
 
 
 Design implementation
@@ -229,7 +253,6 @@ b) Has pressure range been specified? Specify Pa(min)/Pa(max) in [Bar]:
 c) Has moisture range been specified? Specify Hg(min)/Hg(max) in [%]:
 
 
-
 Schematic design & implementation
 ----------------------------------
 This section cannot be filled out until the 
@@ -250,9 +273,16 @@ h) are all output terminals placed on the right side of schematic / each sub-sch
 i) are all (passive) component tolerances given in schematic wherever non-default?
 j) are a default tolerance value given for each type of (passive) components?
 
-2) Schematic design output
+2) Component selection
+a) List all components which are single-source, with partnumber(if yet decided), type and rationale:
+b) List all IC-components with known 2.source, with partnumber(if yet decided) and type:
+d) List all components which are diverging from given environment conditions,
+   with partnumber(if yet decided), type and rationale:
+
+3) Schematic design output
 a) is an automated BOM produced from the schematic?
 b) is a PDF of the schematic in color produced, with search capability?
+
 
 
 PCB design & implementation
@@ -282,6 +312,8 @@ c) Symbol library/libraries used:
 d) Complexity (# of nets):
 e) Longest net in [mm]:
 f) (Estimated) highest frequency on any net in [Hz]:
+g) Buried vias used?
+   If yes, specify # in total and between which layers.
 
 3) PCB layout verification
 a) Has netlist extraction & automated comparison with schematic been performed?
@@ -289,15 +321,28 @@ b) has parasitics extraction & automated back-annotation of netlist been perform
 c) has design-rules check (DRC) been performed on layout?
 d) has alignment structures been incorporated in layout?
 f) has 3D model of PCB been created, with all components included?
+   If YES, specify format (e.g. SVG, DXF etc.):
+   If NO, give rationale:
 g) has 3D model of mechanics been created, and integrated with 3D model of PCB w. components?
-h) has access to all connectors been verified?
+h) has access to all connectors been verified via 3D model?
 
 4) PCB design completion
+NOTE: refer to CMS (SharePoint) for location of all design-outputs stored!
 a) Are silkscreen containing all testpoint labels?
 If NO, list which are missing:
 b) Are silkscreen indicating connector orientation and pinning? 
 NOTE: that is, preferably all pin numbers as labels, minimum pin#1.
-
+c) GERBER produced?
+d) Drill file produced?
+e) PnP file produced?
+f) Mechanical tolerances assessed & specified in production documents (2D&3D CAD drawings), for all items below:
+   - PCB
+   - fasteners and enclosure
+   - drill holes
+g) Special finishing or post-processing of PCB and/or assembled product procured in written form?
+   Add reference to document:
+h) Manual procedure outside standard production-process specified?
+   Add reference to document:
 
 
 
