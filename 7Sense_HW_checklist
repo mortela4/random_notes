@@ -73,11 +73,64 @@ Check all that applies:
 * Memories/storage. Type and optionally standard/product-family(indicates 2.source exist):
 * Sensors. Type(s):
 * Other types regarded as of importance. List what types:
-
 NOTE: if none of the above component types are checked, 
 the design is assumed to consist solely of connectors, signal routing and/or passive components!
 
 
+Design classification
+----------------------
+1) Voltage-range classification
+a) Does the design involve voltages above 60V (i.e. possibly lethal)?
+b) Does the design involve voltages in the range 60V down to 24V (i.e. non-lethal, but possibility of arcing)?
+c) Does the design involve voltages below 24V?
+
+2) Current-range classification
+a) Does the design have a targeted minimum current specification?
+b) Does the design have a targeted maximum current specification?
+
+3) Power-source classification
+Select all that apply:
+a) Mains-operated directly (i.e. AC-adaptor within)
+b) Mains-operated indirectly (using external AC-adaptor, not part of the design)
+c) Charge-storage operated
+   Specify type:
+   * non-chargeable battery (specify #cells, Vnom, chemistry, capacity in [Ah]):
+   * chargeable battery (specify #cells, Vnom, chemistry, capacity in [Ah], max. charging current in [A]): 
+   * capacitor (specify capacity in C*V = [Joule]):   
+d) Energy-harvesting (specify max. current and nominal voltage):
+   * Mechanical (specify type):
+   * Thermo-electric (specify type):
+   * Photo-voltaic (specify type):
+   * Other (specify type):
+f) Power-consumption target specified?
+If YES, specify target(s) in [A@Vnom]:
+NOTE: targets can f.ex. be specified as "target1: 5E-6A@3.3V in SLEEP, target2: 1.5E-3A@3.3V in ACTIVE".
+   
+4) Safety classification
+a) Is the design required to comply with a functional safety standard (e.g. IEC-type standard, or ISO):
+If yes, specify
+* type of standard (in full std.#):
+* safety level (L<n>):
+b) Is the design required to comply with hazardous or special area operation:
+If yes, specify type (e.g. EX-area, medical etc.):
+c) Is the design required to comply with a environment operational standard (e.g. IP-classification):
+If yes, specify type (e.g. IP-class):
+d) Is specific contact-safe shielding and/or isolation required?
+If yes, specify planned type:
+
+5) Product development classification:
+a) Is the development process for the design/project required to comply with a specific standard?
+If YES, specify 
+* standard (e.g. DO-178C etc.):
+* category (medical, military, aerospace):
+
+6) Generic end-product classification:
+a) Is the design to be regarded as a finished product, with certification requirements as such?
+If YES, 
+* list required certifications (CE, UL, FCC etc.):
+* specify type of certification [formal|informal]:
+
+ 
 Design tools and procedures
 ---------------------------
 
@@ -244,13 +297,74 @@ If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
 
 If YES to above, fill out section 6.1, 6.2 and 6.3! 
 
-
+7) Subsystem power delivery
+Are any subsystems or design partition designed for non-continuous operation?
+   If YES, specify
+   a) subsystem(s) (by name and/or type):
+   b) method for operation control (check all that applies, specify subsystem which applies and type):
+      * mode switching (e.g. "analog block A3, SLEEP-pin toggle via MCU GPIO"):
+	  * pin control (e.g. "sensor block S1, using ENABLE-pin of U23"):
+	  * power control (e.g. "load-switch U4 using MCU GPIO"): 
+   c) method for communication between subsystems and/or rest of system:
+      * none (i.e. subsystem is self-contained):
+	  * isolated I/O (e.g. trafo, opto, coupler-IC):
+	  * capacitive AC-coupling:
+	  * using directional driver(s)/voltage translator:
+	  * using bidirectional driver(s)/voltage translator:
+	  * using discrete solution (e.g. diodes, clamps etc.):
+	  * direct I/O, no voltage or I/O-standard translation (NOTE: give rationale for correctness - e.g. I/O compatibility etc.!):
+	  
 Environment constraints:
 
 7) Operational range
 a) Has temperature range been specified? Specify Ta(min)/Ta(max) in [C]:
 b) Has pressure range been specified? Specify Pa(min)/Pa(max) in [Bar]:
 c) Has moisture range been specified? Specify Hg(min)/Hg(max) in [%]:
+
+Protection and safety features:
+
+8) Power supplies protection
+If NO, give rationale (e.g. "integrated in power-supply module or regulator device"):
+a) Is polarity-reversal protection planned?
+If YES, specify type:
+b) Is over-voltage protection planned?
+If YES, specify type:
+b) Is over-current protection planned?
+If YES, specify type:
+c) Is inrush-current  protection planned?
+If YES, specify type/method:
+d) Is galvanic isolation required for any supply?
+If YES, specify 
+* type:
+* minimum isolation voltage
+
+9) INputs protection and functional safety
+If NO, give rationale (e.g. "integrated in connector"):
+a) Are all external inputs assessed and issues identified with regard to 
+* ESD-susceptibility?
+* High voltage?
+* High current?
+* Noise/EMI?
+* potential differences?
+* current loops?
+b) Are all external inputs assessed and issues identified with regard to 
+* initial condition (i.e. pull-up/down required)?
+* transient conditions (i.e. minimum pulse-duration, filtering required etc.)?
+* 
+
+10) OUTputs protection
+If NO, give rationale (e.g. "integrated in driver IC"):
+a) Are all external outputs assessed and issues identified with regard to 
+* ESD-susceptibility?
+* High voltage?
+* Current handling(i.e. current-drive)?
+* Overcurrent/short-circuit protection?
+* Load handling (switching frequency and/or slew-rate vs. transmission delay and characteristic RLC-load)?
+* Noise/EMI
+* back-EMF (i.e. motor-drivers etc.)?
+* overshoot/undershoot (i.e. clamping required)?
+* potential differences?
+* current loops (i.e. digital I/Os supplying external devices/systems)?
 
 
 Schematic design & implementation
@@ -345,7 +459,20 @@ h) Manual procedure outside standard production-process specified?
    Add reference to document:
 
 
+Summary
+=======
 
+1) Review acceptance:
+a) Has all review items been checked?
+b) Is there a digression document?
+   If YES, specify location in CMS:
+c) Is the review document completed?
+d) Is the review document accepted by team leader / designer(s) and reviewer(s)?
+
+
+2) Signatures of team leader / designer(s) and reviewer(s)
+
+Printed name:		Role:        Signature:
 
 
 
