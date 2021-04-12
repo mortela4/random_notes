@@ -10,8 +10,17 @@ It is both a checklist and a review-procedure document,
 aiming not only to reveal lack of planning, 
 missing steps in design flow and other discrepancies, 
 but also (hopefully) provide help in the process of 
-enforcing good design methodology.
+enforcing good HW-design methodology.
 
+'Good HW-design methodology' shall ultimately lead to a system 
+with HW that operates reliant diregarding the SW that runs on it.
+'Reliant' in this context can be interpreted as
+* always operating within parametric limits (i.e. Iload <= Iload(max)) w.r.t. system inputs & outputs, 
+  which ALWAYS include AT LEAST 5% margin w.r.t. critical values 
+* always operates predictable (i.e. no undocumented states, and no unintentional bi-stable or oscillatory states),
+  and with functional safety (i.e. always design with functional safety in mind; do NOT design away safety even if no safety requirements are given)
+Both design goals assume failing SW, as a functionally correct HW-design cannot be dependent on functionally correct SW!
+  
 Note that this is an INTERNAL document, 
 NOT a deliverable! It's target audience is primarily 
 fellow HW & SW developers within 7Sense, 
@@ -298,13 +307,14 @@ If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
 If YES to above, fill out section 6.1, 6.2 and 6.3! 
 
 7) Subsystem power delivery
+NOTE: this subsection is only relevant if multiple power-domains are used!
 Are any subsystems or design partition designed for non-continuous operation?
    If YES, specify
    a) subsystem(s) (by name and/or type):
    b) method for operation control (check all that applies, specify subsystem which applies and type):
       * mode switching (e.g. "analog block A3, SLEEP-pin toggle via MCU GPIO"):
 	  * pin control (e.g. "sensor block S1, using ENABLE-pin of U23"):
-	  * power control (e.g. "load-switch U4 using MCU GPIO"): 
+	  * power control (e.g. "load-switch U4 controlled by MCU GPIO powers domain Vcc4"): 
    c) method for communication between subsystems and/or rest of system:
       * none (i.e. subsystem is self-contained):
 	  * isolated I/O (e.g. trafo, opto, coupler-IC):
@@ -313,6 +323,13 @@ Are any subsystems or design partition designed for non-continuous operation?
 	  * using bidirectional driver(s)/voltage translator:
 	  * using discrete solution (e.g. diodes, clamps etc.):
 	  * direct I/O, no voltage or I/O-standard translation (NOTE: give rationale for correctness - e.g. I/O compatibility etc.!):
+   d) is power-domain susceptible to backdrive via pull-ups or input-protection diodes of domain pins?
+      If YES, list pins affected, with corresponding controlling signal connected to pin, together with 
+	  * strategy for avoiding backdrive, and
+	  * a rationale for design choice in terms of system correctness
+	  NOTE: the latter is EXTREMELY important, as the complete system design and its verification becomes 
+      dependent on SW design if design strategy involves programmability features rather than intrinsic HW-features!	  
+	  
 	  
 Environment constraints:
 
@@ -366,7 +383,7 @@ a) Are all external outputs assessed and issues identified with regard to
 * potential differences?
 * current loops (i.e. digital I/Os supplying external devices/systems)?
 
-
+ 
 Schematic design & implementation
 ----------------------------------
 This section cannot be filled out until the 
