@@ -32,6 +32,19 @@ but a separate document shall be used for reviewing a design
 for 'manufacturing-readiness'.  
 
 
+Design category
+---------------
+Choose one only:
+1) in-house evaluation only?
+2) informal prototype (no documentation required)?
+3) prototype (limited documentation available)?
+4) pre-production/pilot production (signoff optional)?
+5) production, first series (signoff required)? 
+6) production, minor modification of existing design?
+7) production, BOM update only (2.source components)?
+NOTE: changing the BOM of a design with a *compatible* component  
+that is NOT a direct replacement from a second source, 
+is NOT categorized as a 'BOM update' - but a 'minor modification of existing design'.
 
 
 Design review
@@ -43,7 +56,7 @@ Design review
 - from written specifications, 
   * if (any) YES, provide reference(s)!
 
-2) how is the design implemented?
+3) how is the design implemented?
 - based on reference design?
 - input from software engineers
 - design from scratch
