@@ -47,6 +47,9 @@ that is NOT a direct replacement from a second source,
 is NOT categorized as a 'BOM update' - but a 'minor modification of existing design'.
 
 
+Design composition
+-------------------
+
 Design review
 --------------
 1) Is project internal, or for external customer?
@@ -193,7 +196,7 @@ PCB layout shall either
 - or manually verified, using analytical methods (e.g. calculate worst-case propagation delay from PCB trace lengths) 
   or direct comparison (e.g. air-gap distances), with written digressions for those nets where properties were set in schematic,
   and supplied with a rationale for acceptance.
-b) other constraints used (specify!) --> e.g. connection required, conditionally required or optional
+c) other constraints used (specify!) --> e.g. connection required, conditionally required or optional
 
 2) Rules checking
 a) what types of DRC and/or ERC have been conducted?
@@ -359,11 +362,11 @@ a) Is polarity-reversal protection planned?
 If YES, specify type:
 b) Is over-voltage protection planned?
 If YES, specify type:
-b) Is over-current protection planned?
+c) Is over-current protection planned?
 If YES, specify type:
-c) Is inrush-current  protection planned?
+d) Is inrush-current  protection planned?
 If YES, specify type/method:
-d) Is galvanic isolation required for any supply?
+e) Is galvanic isolation required for any supply?
 If YES, specify 
 * type:
 * minimum isolation voltage
