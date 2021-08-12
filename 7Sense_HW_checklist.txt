@@ -1,0 +1,516 @@
+Hardware checklist
+===================
+
+Introduction
+-------------
+This is a document to describe the process of
+hardware design internally at 7Sense Technologies AS.
+
+It is both a checklist and a review-procedure document,
+aiming not only to reveal lack of planning, 
+missing steps in design flow and other discrepancies, 
+but also (hopefully) provide help in the process of 
+enforcing good HW-design methodology.
+
+'Good HW-design methodology' shall ultimately lead to a system 
+with HW that operates reliant diregarding the SW that runs on it.
+'Reliant' in this context can be interpreted as
+* always operating within parametric limits (i.e. Iload <= Iload(max)) w.r.t. system inputs & outputs, 
+  which ALWAYS include AT LEAST 5% margin w.r.t. critical values 
+* always operates predictable (i.e. no undocumented states, and no unintentional bi-stable or oscillatory states),
+  and with functional safety (i.e. always design with functional safety in mind; do NOT design away safety even if no safety requirements are given)
+Both design goals assume failing SW, as a functionally correct HW-design cannot be dependent on functionally correct SW!
+  
+Note that this is an INTERNAL document, 
+NOT a deliverable! It's target audience is primarily 
+fellow HW & SW developers within 7Sense, 
+not staff at contract manufacturers or external customers. 
+This implies that content is adapted for those who are 
+tasked with interpreting, comprehending and using the HW design.
+Some points regarding PCB-specific characteristics are included, 
+but a separate document shall be used for reviewing a design 
+for 'manufacturing-readiness'.  
+
+
+Design category
+---------------
+Choose one only:
+1) in-house evaluation only?
+2) informal prototype (no documentation required)?
+3) prototype (limited documentation available)?
+4) pre-production/pilot production (signoff optional)?
+5) production, first series (signoff required)? 
+6) production, minor modification of existing design?
+7) production, BOM update only (2.source components)?
+NOTE: changing the BOM of a design with a *compatible* component  
+that is NOT a direct replacement from a second source, 
+is NOT categorized as a 'BOM update' - but a 'minor modification of existing design'.
+
+
+Design composition
+-------------------
+
+Design review
+--------------
+1) Is project internal, or for external customer?
+
+2) how is design planned
+- from written specifications, provided by customer?
+- from written specifications, 
+  * if (any) YES, provide reference(s)!
+
+3) how is the design implemented?
+- based on reference design?
+- input from software engineers
+- design from scratch
+
+3) is a block schematic provided?
+- if NO give rationale
+
+4) is a design interpretation presented?
+- if NO give rationale
+- if YES, is the interpretation recorded and accepted by team leader (and optionally the team)?
+
+5) Is a test-strategy provided?
+- if NO give rationale
+- if YES, 
+a) is the interpretation recorded and accepted by team leader (and optionally the team)?
+b) does the test-stragegy involve (check all YES/NO)
+* BIT (i.e. automated or semi-automated HW-test). Name type (e.g. bed-of-nails, JTAG) or method:
+* BIST (i.e. automated HW self-test). Name type (e.g. ROM code) or method:
+* manual procedures. Specify method:
+
+6) Overall project description.
+a) Is a project design-description provided?
+If YES, add reference:
+If NO, give rationale:
+b) What type of components does the design contain?
+Check all that applies:
+* Power, including modules. Describe voltage(s) and current output in [A] (e.g. 400V/10A):
+* Frequency-control, including modules. Describe type(s) and frequency/frequencies:
+* MCU, including modules. Provide description (architecture and internal memories), full partnumber(s) or optionally base partnumber if multiple pin-compatibles:
+* MPU/CPU (or SoC), including modules. Provide description (architecture and internal memories), full partnumber(s) or optionally base partnumber if multiple pin-compatibles:
+* FPGA/PLD, including modules. Provide full partnumber(s) or optionally base partnumber or product family if multiple pin-compatibles:
+* RF (including Bluetooth/BLE). Provide frequency/frequencies in [Hz], and protocol (if any), along with full partnumber(s) or optionally base partnumber or product family if multiple pin-compatibles:
+* Display. Type or standard:
+* Wired networking. Type or standard:
+* Wireless networking. Type or standard:
+* Memories/storage. Type and optionally standard/product-family(indicates 2.source exist):
+* Sensors. Type(s):
+* Other types regarded as of importance. List what types:
+NOTE: if none of the above component types are checked, 
+the design is assumed to consist solely of connectors, signal routing and/or passive components!
+
+
+Design classification
+----------------------
+1) Voltage-range classification
+a) Does the design involve voltages above 60V (i.e. possibly lethal)?
+b) Does the design involve voltages in the range 60V down to 24V (i.e. non-lethal, but possibility of arcing)?
+c) Does the design involve voltages below 24V?
+
+2) Current-range classification
+a) Does the design have a targeted minimum current specification?
+b) Does the design have a targeted maximum current specification?
+
+3) Power-source classification
+Select all that apply:
+a) Mains-operated directly (i.e. AC-adaptor within)
+b) Mains-operated indirectly (using external AC-adaptor, not part of the design)
+c) Charge-storage operated
+   Specify type:
+   * non-chargeable battery (specify #cells, Vnom, chemistry, capacity in [Ah]):
+   * chargeable battery (specify #cells, Vnom, chemistry, capacity in [Ah], max. charging current in [A]): 
+   * capacitor (specify capacity in C*V = [Joule]):   
+d) Energy-harvesting (specify max. current and nominal voltage):
+   * Mechanical (specify type):
+   * Thermo-electric (specify type):
+   * Photo-voltaic (specify type):
+   * Other (specify type):
+f) Power-consumption target specified?
+If YES, specify target(s) in [A@Vnom]:
+NOTE: targets can f.ex. be specified as "target1: 5E-6A@3.3V in SLEEP, target2: 1.5E-3A@3.3V in ACTIVE".
+   
+4) Safety classification
+a) Is the design required to comply with a functional safety standard (e.g. IEC-type standard, or ISO):
+If yes, specify
+* type of standard (in full std.#):
+* safety level (L<n>):
+b) Is the design required to comply with hazardous or special area operation:
+If yes, specify type (e.g. EX-area, medical etc.):
+c) Is the design required to comply with a environment operational standard (e.g. IP-classification):
+If yes, specify type (e.g. IP-class):
+d) Is specific contact-safe shielding and/or isolation required?
+If yes, specify planned type:
+
+5) Product development classification:
+a) Is the development process for the design/project required to comply with a specific standard?
+If YES, specify 
+* standard (e.g. DO-178C etc.):
+* category (medical, military, aerospace):
+
+6) Generic end-product classification:
+a) Is the design to be regarded as a finished product, with certification requirements as such?
+If YES, 
+* list required certifications (CE, UL, FCC etc.):
+* specify type of certification [formal|informal]:
+
+ 
+Design tools and procedures
+---------------------------
+
+Tools:
+
+1) list tools and versions thereof used for design
+
+2) list tools and versions thereof used for verification
+
+3) list and describe manual procedures used in design and verification, 
+   especially cases where tools were not sufficient
+
+4) Describe type and format of design-handoff deliverables (BOM etc.):
+
+
+Design flow:
+
+1) schematic properties
+a) are PIN properties used? (YES/consistently, Partially, NO/excluded)
+If YES, specify pin property types:
+- direction --> out, in, bidirectional (applies both to ICs and connectors)
+- type --> open-drain/source, CMOS(Rail-to-Rail), TTL, LVDS, analog, dedicated(e.g. USB) etc.
+- fanout --> constrained(1:1/1:N = number of 'characterisic loads' - specify capacitance or current-drive), dedicated(Tx/Rx-pair) etc.
+- drive --> [x]mA sink/source, SlewRate, Schmitt-trigger input, tristatable(OUTput) etc.
+- I/O-voltage --> [V]-standard, multi-drive(given by Vdd_io) or range(specify Vhi(min), Vhi(max))
+- STATIC (connected to Vcc or GND, directly or thorugh pull-up/down) or DYNAMIC(optionally specify max. switching frequency)
+b) are NET properties used? (YES/consistently, Partially, NO/excluded)
+If YES, specify net property types:
+- current load 
+- characteristic impedance (within min/max) at given frequency or frequency range
+- coupling w. other nets (e.g. differential, balanced signaling)
+- HV isolation (isolation voltage in [V], minimum resistance between given net(s), or air-gap distance)
+NOTE: net properties should ideally propagate to PCB layout tool! 
+If this is NOT the case, and PCB-layout tool itself has no verification mechanisms, 
+PCB layout shall either
+- be extracted as back-annotated netlist with parasitics (R,L,C) and verified using simulation tool,
+   or imported into schematic capture tool and verified there 
+- or manually verified, using analytical methods (e.g. calculate worst-case propagation delay from PCB trace lengths) 
+  or direct comparison (e.g. air-gap distances), with written digressions for those nets where properties were set in schematic,
+  and supplied with a rationale for acceptance.
+c) other constraints used (specify!) --> e.g. connection required, conditionally required or optional
+
+2) Rules checking
+a) what types of DRC and/or ERC have been conducted?
+- connectivity check (= "all nets connected?")
+- I/O integrity 
+  * no two outputs connected to each other, unless open drain or open-source or bidirectional 
+  * pull-up/down where required --> have all INputs been analyzed for static level forcing?
+- voltage compatibility --> OUTput connected to INput of same or compatible I/O voltage level and/or signalling type
+
+3) Simulation & formal verification
+a) were complete, functional simulation of design performed?
+b) if YES to above 
+- add reference to simulation results/output here:
+- specify TYPE of simulation (analog, digital, both(separate) or co-sim/mixed-signal):
+c) if NO to above, specify what part(s) were simulated:
+* Power Supply/supplies
+* analog part of design
+* digital part of design 
+  Specify type:
+  * digital only, type PLC (ladder program or similar)
+  * digital only, type HDL
+  * Mixed HDL + SW co-simulation
+  * true mixed-signal (e.g. HDL+AHDL, HDL+Spice co-sim. etc.)
+* other (specify):
+d) S-parameters extracted & analyzed, or critical nets verified as (2E8[m/s] / fmax) > 2*L ?
+e) EMC simulation performed?
+f) EMI simulation performed?
+
+
+Design implementation
+---------------------
+
+Design foundation:
+
+1) If a reference design was used (see: HW Design Review, part 1),
+indicate if the following procedures followed:
+a) pinout (i.e. GPIOs) of programmable device (MCU, CPU/SoC, FPGA/PLD or similar) re-used -
+i.e. exactly the same?
+b) PCB layout exactly the same (i.e. copied from design files)?
+- if NO to above, were PCB layout of critical nets kept exactly the same?
+c) peripheral devices (e.g. memories, transceivers, power-supply devices etc.) kept exactly the same?
+d) is usage of peripheral devices (e.g. mode, speed etc.) kept exactly the same?
+- if NO to above, was peripheral device used in another mode or at another speed?
+e) was exactly same levels on I/Os used?
+f) was exactly same connectors used?
+
+
+Design partitioning and modularization:
+
+2) Was Power-supply design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, specify if supply (or supplies) is/are implemented  
+a) as custom-designed module?
+b) with COTS module(s)?
+If YES to b), specify product(s):
+
+2.1) Give rationale for choice above:
+
+3) Was any off-chip memories (RAM, Flash etc.) used?
+If YES, was this in the form of
+a) discrete design?
+b) standard module (e.g. DIMM, SDcard, M.2 etc.)?
+If YES to b), specify type and/or specific product(s):
+
+3.1) Give rationale for choice above:
+
+
+4) Was computing-subsystem design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, fill out section 4.1, 4.2 and 4.3! 
+
+4.1) specify if MCU/CPU/SoC/FPGA subsystem(s) is/are implemented  
+a) as custom-designed module? Specify IC device(s):
+b) with COTS module(s)? Specify product(s) and standard (e.g. OSM from sget.org):
+
+4.2) specify connectivity of computing module
+a) solderable, non-standardized
+b) solderable, non-standardized. Reference to standard:
+c) pin-header, non-standard pinout
+d) pin-header, w. standardized pinout. Reference to standard:
+e) board connector, non-standard pinout
+f) board connector, w. standardized pinout. Reference to standard:
+g) backplane (i.e. 'rack') connector, non-standard pinout
+h) backplane (i.e. 'rack') connector, w. standardized pinout. Reference to standard:
+Rationale for chosen implementation:
+
+4.3) Computing-subsystem partitioning design-goals
+Select ONE of the following:
+a) computing module to be re-used
+b) carrier-board to be re-used
+c) both module and carrier-board designed for re-use
+d) multiple, connected but replaceable computing units
+
+
+5) Was RF-subsystem design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, fill out section 5.1 and 5.2! 
+5.1) specify if RF subsystem(s) is/are implemented  
+a) as custom-designed module? Specify IC device(s):
+b) with COTS module(s)? Specify product(s) and standard (e.g. Arduino-type expansion board, mPCIE module etc.):
+
+4.2) specify connectivity of RF module
+a) solderable, non-standardized
+b) solderable, non-standardized. Reference to standard:
+c) pin-header, non-standard pinout
+d) pin-header, w. standardized pinout. Reference to standard:
+e) board connector, non-standard pinout
+f) board connector, w. standardized pinout. Reference to standard:
+Rationale for chosen implementation:
+
+4.3) RF-subsystem partitioning design-goals
+Select ONE of the following:
+a) RF module to be re-used
+b) carrier-board to be re-used
+c) both
+
+
+6) Was networking-subsystem design made modular?
+If NO (i.e. fully discrete solution implemented on (main)board), give rationale:
+
+If YES to above, fill out section 6.1, 6.2 and 6.3! 
+
+7) Subsystem power delivery
+NOTE: this subsection is only relevant if multiple power-domains are used!
+Are any subsystems or design partition designed for non-continuous operation?
+   If YES, specify
+   a) subsystem(s) (by name and/or type):
+   b) method for operation control (check all that applies, specify subsystem which applies and type):
+      * mode switching (e.g. "analog block A3, SLEEP-pin toggle via MCU GPIO"):
+	  * pin control (e.g. "sensor block S1, using ENABLE-pin of U23"):
+	  * power control (e.g. "load-switch U4 controlled by MCU GPIO powers domain Vcc4"): 
+   c) method for communication between subsystems and/or rest of system:
+      * none (i.e. subsystem is self-contained):
+	  * isolated I/O (e.g. trafo, opto, coupler-IC):
+	  * capacitive AC-coupling:
+	  * using directional driver(s)/voltage translator:
+	  * using bidirectional driver(s)/voltage translator:
+	  * using discrete solution (e.g. diodes, clamps etc.):
+	  * direct I/O, no voltage or I/O-standard translation (NOTE: give rationale for correctness - e.g. I/O compatibility etc.!):
+   d) is power-domain susceptible to backdrive via pull-ups or input-protection diodes of domain pins?
+      If YES, list pins affected, with corresponding controlling signal connected to pin, together with 
+	  * strategy for avoiding backdrive, and
+	  * a rationale for design choice in terms of system correctness
+	  NOTE: the latter is EXTREMELY important, as the complete system design and its verification becomes 
+      dependent on SW design if design strategy involves programmability features rather than intrinsic HW-features!	  
+	  
+	  
+Environment constraints:
+
+7) Operational range
+a) Has temperature range been specified? Specify Ta(min)/Ta(max) in [C]:
+b) Has pressure range been specified? Specify Pa(min)/Pa(max) in [Bar]:
+c) Has moisture range been specified? Specify Hg(min)/Hg(max) in [%]:
+
+Protection and safety features:
+
+8) Power supplies protection
+If NO, give rationale (e.g. "integrated in power-supply module or regulator device"):
+a) Is polarity-reversal protection planned?
+If YES, specify type:
+b) Is over-voltage protection planned?
+If YES, specify type:
+c) Is over-current protection planned?
+If YES, specify type:
+d) Is inrush-current  protection planned?
+If YES, specify type/method:
+e) Is galvanic isolation required for any supply?
+If YES, specify 
+* type:
+* minimum isolation voltage
+
+9) INputs protection and functional safety
+If NO, give rationale (e.g. "integrated in connector"):
+a) Are all external inputs assessed and issues identified with regard to 
+* ESD-susceptibility?
+* High voltage?
+* High current?
+* Noise/EMI?
+* potential differences?
+* current loops?
+b) Are all external inputs assessed and issues identified with regard to 
+* initial condition (i.e. pull-up/down required)?
+* transient conditions (i.e. minimum pulse-duration, filtering required etc.)?
+* 
+
+10) OUTputs protection
+If NO, give rationale (e.g. "integrated in driver IC"):
+a) Are all external outputs assessed and issues identified with regard to 
+* ESD-susceptibility?
+* High voltage?
+* Current handling(i.e. current-drive)?
+* Overcurrent/short-circuit protection?
+* Load handling (switching frequency and/or slew-rate vs. transmission delay and characteristic RLC-load)?
+* Noise/EMI
+* back-EMF (i.e. motor-drivers etc.)?
+* overshoot/undershoot (i.e. clamping required)?
+* potential differences?
+* current loops (i.e. digital I/Os supplying external devices/systems)?
+
+ 
+Schematic design & implementation
+----------------------------------
+This section cannot be filled out until the 
+previous sections are completed, and agreed upon by 
+team leader and reviewer(s)!
+
+1) Schematic construction
+List named, functional blocks in the design:
+a) are all functional blocks present as separate blocks in schematic?
+b) are all functional blocks drawn with easily identifiable I/O ports, where symbol gives direction?
+c) are all signal nets attached to a testpoint labeled "TP<n>" (n=testpoint number)?
+d) does differential analog signal-pairs or balanced digital I/Os have a testpoint-pair 
+   attached as closely to each other - and optionally to the driver - as possible?
+e) are all supply-nets attached to at least one testpoint?
+f) is there at least one pin or fixture in the schematic for easy connection to signal GND?
+g) are all input terminals placed on the left side of schematic / each sub-schematic?
+h) are all output terminals placed on the right side of schematic / each sub-schematic?
+i) are all (passive) component tolerances given in schematic wherever non-default?
+j) are a default tolerance value given for each type of (passive) components?
+
+2) Component selection
+a) List all components which are single-source, with partnumber(if yet decided), type and rationale:
+b) List all IC-components with known 2.source, with partnumber(if yet decided) and type:
+d) List all components which are diverging from given environment conditions,
+   with partnumber(if yet decided), type and rationale:
+
+3) Schematic design output
+a) is an automated BOM produced from the schematic?
+b) is a PDF of the schematic in color produced, with search capability?
+
+
+
+PCB design & implementation
+----------------------------
+This section cannot be filled out until the 
+previous sections are completed, and agreed upon by 
+team leader and reviewer(s)!
+
+1) PCB characteristics
+a) type of material:
+b) # of layers:
+   Which is sum of
+   - # of Vcc layers:
+   - # of GND layers:
+   - # of signal layers:
+   - # of other layers:
+   NOTE: specify as signal layers if Vcc and signal routed on same layer!
+c) copper thickness(es):
+d) type of post-processing (e.g. filling, surface processing etc.): 
+   NOTE: specify "none" if no post-processing is expected!
+e) dimensions w/o components as L(max)/H(max)/W(max):
+
+2) PCB layout
+a) Standards compliance (e.g. IPC-std. etc.):
+b) Design-rules used ("none" if NOT applicable):
+c) Symbol library/libraries used:
+d) Complexity (# of nets):
+e) Longest net in [mm]:
+f) (Estimated) highest frequency on any net in [Hz]:
+g) Buried vias used?
+   If yes, specify # in total and between which layers.
+
+3) PCB layout verification
+a) Has netlist extraction & automated comparison with schematic been performed?
+b) has parasitics extraction & automated back-annotation of netlist been performed?
+c) has design-rules check (DRC) been performed on layout?
+d) has alignment structures been incorporated in layout?
+f) has 3D model of PCB been created, with all components included?
+   If YES, specify format (e.g. SVG, DXF etc.):
+   If NO, give rationale:
+g) has 3D model of mechanics been created, and integrated with 3D model of PCB w. components?
+h) has access to all connectors been verified via 3D model?
+
+4) PCB design completion
+NOTE: refer to CMS (SharePoint) for location of all design-outputs stored!
+a) Are silkscreen containing all testpoint labels?
+If NO, list which are missing:
+b) Are silkscreen indicating connector orientation and pinning? 
+NOTE: that is, preferably all pin numbers as labels, minimum pin#1.
+c) GERBER produced?
+d) Drill file produced?
+e) PnP file produced?
+f) Mechanical tolerances assessed & specified in production documents (2D&3D CAD drawings), for all items below:
+   - PCB
+   - fasteners and enclosure
+   - drill holes
+g) Special finishing or post-processing of PCB and/or assembled product procured in written form?
+   Add reference to document:
+h) Manual procedure outside standard production-process specified?
+   Add reference to document:
+
+
+Summary
+=======
+
+1) Review acceptance:
+a) Has all review items been checked?
+b) Is there a digression document?
+   If YES, specify location in CMS:
+c) Is the review document completed?
+d) Is the review document accepted by team leader / designer(s) and reviewer(s)?
+
+
+2) Signatures of team leader / designer(s) and reviewer(s)
+
+Printed name:		Role:        Signature:
+
+
+
+
+
+
+
+
