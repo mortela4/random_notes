@@ -42,8 +42,8 @@ For fast-track solutions, it bundles the following modules:
 
 
 ### Other/standalone (not template-based)
-https://github.com/Aaronontheweb/scaffold-py --> PyPi-packagename 'Scaffold' (simple fork of pyscaffold?)
-https://github.com/s3rius/FastAPI-template --> Complete Py-package based on cookiecutter. Feature-rich; choice of API-accessmethod, database etc.
+- https://github.com/Aaronontheweb/scaffold-py --> PyPi-packagename 'Scaffold' (simple fork of pyscaffold?)
+- https://github.com/s3rius/FastAPI-template --> Complete Py-package based on cookiecutter. Feature-rich; choice of API-accessmethod, database etc.
 
 ## Generator Templates
 
@@ -52,27 +52,27 @@ The full list of *published* templates (on GitHub) for cookiecutter is at:
 http://cookiecutter-templates.sebastianruml.name/
 
 Simple:
-cookiecutter https://github.com/luphord/cookiecutter-pyscript.git --> single-file Py-script
-cookiecutter https://github.com/luphord/cookiecutter-pyscript --> same
-cookiecutter https://github.com/dataloudlabs/cookiecutter-pyscript --> w. basic test-capability
+- cookiecutter https://github.com/luphord/cookiecutter-pyscript.git --> single-file Py-script
+- cookiecutter https://github.com/luphord/cookiecutter-pyscript --> same
+- cookiecutter https://github.com/dataloudlabs/cookiecutter-pyscript --> w. basic test-capability
 
 Stand-alone apps:
-cookiecutter https://github.com/benwebber/cookiecutter-standalone --> flexible, can generate Py-wheel, EXE or RPM (best for CLI-tools)
-cookiecutter https://github.com/William-Lake/ScriptToExeCC.git --> generates Win-EXE using GitHub-action='pyinstaller-windows'
+- cookiecutter https://github.com/benwebber/cookiecutter-standalone --> flexible, can generate Py-wheel, EXE or RPM (best for CLI-tools)
+- cookiecutter https://github.com/William-Lake/ScriptToExeCC.git --> generates Win-EXE using GitHub-action='pyinstaller-windows'
 
 WebDev-focused:
-https://github.com/tiangolo/full-stack --> choice of Flask or FastAPI as back-end server
-https://github.com/BrentGruber/fastapi-mysql-cookiecutter
-https://github.com/nhjeon/cookiecutter-fastapi-mysql
-https://github.com/rwinte/cookiecutter-fastapi-sqlite
-https://github.com/jonatasoli/fastapi-template-cookiecutter
+- https://github.com/tiangolo/full-stack --> choice of Flask or FastAPI as back-end server
+- https://github.com/BrentGruber/fastapi-mysql-cookiecutter
+- https://github.com/nhjeon/cookiecutter-fastapi-mysql
+- https://github.com/rwinte/cookiecutter-fastapi-sqlite
+- https://github.com/jonatasoli/fastapi-template-cookiecutter
 
 Generic:
-https://github.com/cjolowicz/cookiecutter-hypermodern-python --> with ALL bells & whistles ...
+- https://github.com/cjolowicz/cookiecutter-hypermodern-python --> with ALL bells & whistles ...
 
 
 ### Py-Scaffold based
-https://github.com/SarthakJariwala/PyScaffold-Interactive
+- https://github.com/SarthakJariwala/PyScaffold-Interactive
 
 
 ## NOTES
@@ -82,9 +82,11 @@ Most of the template-based solutions (at least for 'cookiecutter') has a Dockerf
 A basic TOML (or YAML) docker-compose specification file is typically given in combination with a Dockerfile, 
 unless a Dockerfile-only basic setup is given.
 
-Use 'docker ps' after startup of Dockerfile to see details like ID, hostname and assigned IP-address .
+Use 'docker ps' after startup of Dockerfile to see details like ID, hostname and assigned IP-address.
 
 ### TAR-archives
+Rarely used anymore. A Python-sourcetree is expanded from a tarball into a in-memory virtual filesystem.
+The application then runs from there, and can refer to files both in this virtual filesystem as well as others.
 
 ### PyInstaller-deployment
 
