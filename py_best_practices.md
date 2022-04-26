@@ -391,3 +391,79 @@ The application then runs from there, and can refer to files both in this virtua
 ### PyInstaller-deployment
 
 
+___
+
+# Pythonic Code
+
+## Variables
+
+Do not use loop counter if it can be avoided. E.g:
+
+*No*
+
+```python
+word_list = ["first", "second", "third"]
+i = 0
+for word in word_list:
+    print(f"Word number {i} is '{word}'")
+```
+
+*Yes*
+
+```python
+word_list = ["first", "second", "third"]
+for i, word in enumerate(word_list):
+    print(f"Word number {i} is '{word}'")
+```
+
+
+## Functions and Methods
+
+### Arguments
+Use *named arguments*. E.g:
+
+*No*
+
+```python
+def linear_func(a, b, x):
+    return a*x + b
+
+x = 7
+a = 1.23
+b = 4.567
+linear_func(a, b, x)
+```
+
+*Yes*
+
+```python
+def linear_func(a, b, x):
+    return a*x + b
+
+x = 7
+a = 1.23
+b = 4.567
+linear_func(a=a, b=b, x=x)
+```
+
+Or, use a dataclass as argument:
+```python
+@dataclass
+
+
+x = 7
+a = 1.23
+b = 4.567
+linear_func(a=a, b=b, x=x)
+```
+
+
+### Scoped Functions
+
+
+### Ordinary methods, class methods and staticmethods
+
+
+## Classes
+
+
