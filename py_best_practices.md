@@ -853,7 +853,7 @@ A package like 'pyserial' is an example of a Python package that meet all requir
 and is the natural (or only ...) choice for any serial-port access whatever platform is in question (WinXX, Linux, MacOS, Android).
 
 
-### Cross-patform Utilities
+### Cross-platform Utilities
 The built-in 'os' and 'sys' packages from the standard library are OK for simpler tasks.
 However, they do handle subtle, cross-platform issues a bit inadequate.
 
@@ -863,8 +863,12 @@ e.g. making code sections platform-dependent:
 import platform
 
 if __name__ == "__main__":
+    if platform
     print("This module is supposed to be run from 'main' module - no standalone execution facilitated!")
     sys.exit(1)
 ``` 	
 
 ### Common Utilities
+- 'filesystem' package for file and folder manipulations
+- 'json' package for JSON manipulations (although good alternatives exist)
+
