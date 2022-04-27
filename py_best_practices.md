@@ -433,6 +433,7 @@ word_list = ["first", "second", "third"]
 i = 0
 for word in word_list:
     print(f"Word number {i} is '{word}'")
+	i += 1
 ```
 
 *Yes*
@@ -450,11 +451,7 @@ opened only during the actual data commit or retrieval.
 E.g:
 ```python
 with open(filename, 'w') as outfile:
-        for name, data in data_dict.items():
-            age = data['Age']
-            gender = data['Gender']
-            outfile.write(f"{name}, {age}, {gender}\n")
-print(f"{even_numbers}")
+        outfile.write(some_data)
 ```
 Typical usage is file and database I/O.
 
@@ -492,6 +489,8 @@ a_derived_set = set(a_list)
 for val in a_derived_set:
     print(val)
 ```
+But, beware of side-effects! Also note that it results in a (deep) copy of data. 
+Changing the list above, does not affect the derived set.
 
 ### Dictionaries and its siblings 
 Dictionaries are a bit different from lists, (NumPy-)arrays, sets, queues and fifos -
