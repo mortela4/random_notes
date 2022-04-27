@@ -399,11 +399,37 @@ General rule is to follow PEP8 rules -
 which are built into tools like PyCharm, Che/Theia and VSCode, 
 and used by linters/auto-formatters like Flake and Black.
 
+## Strings
+Use F-strings consistently. There are very few exceptions to this rule ...
+(unless you must use Python2.7 ...)
+
+Use UTF-8 unless working with ASCII-based protocols.
+(although 7-bit ASCII maps directly into UTF-8 ...)
+
+Use raw strings for multi-line strings and JSON-data 
+(or whatever data that use characters that otherwise would have to be escaped).
+E.g.
+
+
 ## Operators
 
+### Logic Operators
 Use logic operators 'and', 'or' and 'not' in logic operations, never '+', '-' !!
 
 Remember that '&', '|', '^' and '~' are BIT-WISE operators!
+
+### NO-OP operation
+The 'pass' keyword should be used to *explicitly* mark a code-path or block as NO-OP.
+E.g:
+```python
+val = 'z'
+if 'x' == val:
+    do_x()
+elif 'y' == val:
+    do_y()
+else:
+    pass	# This shows INTENTION behind the code!
+```
 
 
 ## Variables
@@ -468,7 +494,8 @@ a_simple_set = ('a', 'b', 'c')
 for ch in a_simple_set:
     print(ch)
 ```
-	
+
+### Collection Comprehensions	
 Prefer *direct* collection-object operations over loops. 
 Especially for up-front generation of values.
 E.g:
@@ -489,7 +516,7 @@ a_derived_set = set(a_list)
 for val in a_derived_set:
     print(val)
 ```
-But, beware of side-effects! Also note that it results in a (deep) copy of data. 
+But, beware of side-effects! Also note that it results in a relatively costly (deep) copy of data. 
 Changing the list above, does not affect the derived set.
 
 ### Dictionaries and its siblings 
@@ -519,6 +546,33 @@ E.g:
 *No*
 ```python
 val = my_dict[my_key]	# Can throw 'KeyError'-exception --> must use try-except block!
+```
+
+Note that dataclasses can be directly converted to dictionaries via 'asdict()' function. 
+E.g.
+```python
+from dataclasses import dataclass, asdict
+
+@dataclass
+class ProtocolParser:
+    header: str = None
+	body: str = None
+	footer: str = None
+	
+	def set(self, data: str):
+		PROTO_DELIMITER = ':'
+		CRC_HEX_STR_SIZE = len("FFFF")	# 16-bit CRC appended to data as hex-string
+	    fields = data.split(PROTO_DELIMITER)[0]
+		if 2 == len(fields):
+		    self.header = fields[0]
+		    self.body = fields[1][:-CRC_HEX_STR_SIZE]
+			self.footer = fields[1][-4]
+		else:
+			print("Data is NOT in conformance with protocol!")
+	
+	def get(self):
+	    return asdict(self)
+	
 ```
 
 
@@ -687,6 +741,52 @@ print(f"{cube(2, 3, 4, 'volume')}")     # Prints '24'
 print(f"{cube(2, 3, 0)}")               # Prints 'None'
 ```
 
+Note that both (references to) functions and lambdas can be stored in any 
+Python data-container class, like the built-in collections.
+
+The example below maps a dictionary directly to class-properties 
+(or, 'members' - as C#/Java-type 'properties' is not built-in to Python)
+via the 'set_props_fromdict()' method of the class:
+```python
+class MyTestClass:
+
+    def __init__(self, a_val: int, b_val: int, c_val: int):
+        self._a_val = a_val
+        self._b_val = b_val
+        self._c_val = c_val
+        self.attr_map = {'a': '_a_val', 'b': '_b_val', 'c': '_c_val'}
+
+    def print_props_properly(self):
+        for key in self.attr_map.keys():
+            print(f"'{key}' = { getattr(self, self.attr_map[key])}")
+
+    def set_props_fromdict(self, prop_set: dict):
+        attr_setter = {
+            'a': (lambda val:  setattr(self, '_a_val', val)), 
+            'b': (lambda val:  setattr(self, '_b_val', val)), 
+            'c': (lambda val:  setattr(self, '_c_val', val))
+            }
+        for name, val in prop_set.items():
+            print(f"Setting '{name}' to value={val} ...")
+            attr_setter[name](val)							# Equivalent to SWITCH-CASE block ...
+
+# Construct a test-instance:
+tst = MyTestClass(3, 5, 7)
+tst.print_props_properly()
+# Test using a complete dict(='config'):
+config1 = {'a': 123, 'b': 357, 'c': 5790}
+tst.set_props_fromdict(prop_set=config1)
+tst.print_props_properly()
+print(f"'a' = {tst._a_val}")    
+# Test using shorter dict:
+config2 = {'a': -666, 'b': -3}
+tst.set_props_fromdict(prop_set=config2)
+print(f"'a' = {tst._a_val}")
+tst.print_props_properly()
+```
+Because JSON(-strings) can be converted directly into dictionaries in Python, 
+the technique above can be utilized to modify objects via internal lookup using JSON as input data.
+
 
 ### Ordinary methods, class methods and staticmethods
 
@@ -696,7 +796,64 @@ print(f"{cube(2, 3, 0)}")               # Prints 'None'
 
 *Always* use 'CamelCase' in class name! E.g. 'class MyClass:'
 
-Use 'dataclass' objects when only *class-internal* data is used, 
+'dataclass' objects should be used when only *class-internal* data is used, 
 and serialization/de-serialization of class instances is relevant.
  
 
+## Modules
+
+### Stand-alone, Functional Test of Modules
+Apart from unit-testing, most every Python module can be functional-tested.
+Also, it is often relevant to run a module as a script - i.e. 'stand-alone'.
+
+The module to be run 'stand-alone' must have code like shown below at the end of the module-file:
+via the 'set_props_fromdict()' method of the class:
+```python
+if __name__ == "__main__":
+    # Insert code for stand-alone execution, or module functional test here.
+	<... code ...>
+```
+
+This can be used even when the module is **NOT** supposed to be run stand-alone:
+```python
+if __name__ == "__main__":
+    print("This module is supposed to be run from 'main' module - no standalone execution facilitated!")
+    sys.exit(1)
+```
+This is useful to avoid misunderstandings and mis-use of module.
+
+
+## Packages
+
+The number of Python packages are endless.
+This section barely scratches the surface, 
+only giving advice for general usage - or pointing to the most used ones.
+
+### Prefer cross-platform, 'native' packages
+If multiple choices exist w. regard to packages for a given functionality, 
+use the one which is
+- cross-platform
+- OS-agnostic, so that API is uniform between platforms 
+- use direct bindings to native (C/C++ -)code, preferrably distributed with the package 
+The last item means stay away from packages that loads external DLLs,
+or opens external applications if you have a choice ...
+
+A package like 'pyserial' is an example of a Python package that meet all requirements above, 
+and is the natural (or only ...) choice for any serial-port access whatever platform is in question (WinXX, Linux, MacOS, Android).
+
+
+### Cross-patform Utilities
+The built-in 'os' and 'sys' packages from the standard library are OK for simpler tasks.
+However, they do handle subtle, cross-platform issues a bit inadequate.
+
+Use the 'platform' package for cross-platform, OS-related functionality, 
+e.g. making code sections platform-dependent:
+```python
+import platform
+
+if __name__ == "__main__":
+    print("This module is supposed to be run from 'main' module - no standalone execution facilitated!")
+    sys.exit(1)
+``` 	
+
+### Common Utilities
