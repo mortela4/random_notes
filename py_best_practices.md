@@ -427,7 +427,16 @@ for i, word in enumerate(word_list):
     print(f"Word number {i} is '{word}'")
 ```
 
+## Iterators and Collections
 
+Prefer *direct* collection-object operations over loops. E.g:
+```python
+even_numbers = [x in range(20) if 0 == (x % 2)]
+
+print(f"{even_numbers}")
+```
+
+ 
 ## Functions and Methods
 
 Return 'None' *explicitly* if arguments or internal data cannot compute valid result, 
