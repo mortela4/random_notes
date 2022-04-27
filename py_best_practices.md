@@ -551,28 +551,39 @@ val = my_dict[my_key]	# Can throw 'KeyError'-exception --> must use try-except b
 Note that dataclasses can be directly converted to dictionaries via 'asdict()' function. 
 E.g.
 ```python
+import json
 from dataclasses import dataclass, asdict
 
 @dataclass
 class ProtocolParser:
     header: str = None
-	body: str = None
-	footer: str = None
-	
-	def set(self, data: str):
-		PROTO_DELIMITER = ':'
-		CRC_HEX_STR_SIZE = len("FFFF")	# 16-bit CRC appended to data as hex-string
-	    fields = data.split(PROTO_DELIMITER)[0]
-		if 2 == len(fields):
-		    self.header = fields[0]
-		    self.body = fields[1][:-CRC_HEX_STR_SIZE]
-			self.footer = fields[1][-4]
-		else:
-			print("Data is NOT in conformance with protocol!")
-	
-	def get(self):
-	    return asdict(self)
-	
+    body: str = None
+    footer: str = None
+
+    def parse(self, data: str):
+    	PROTO_DELIMITER = ':'
+    	CRC_HEX_STR_SIZE = len("FFFF")	# 16-bit CRC appended to data as hex-string
+    	fields = data.split(PROTO_DELIMITER)
+    	if 2 == len(fields):
+    	    self.header = fields[0]
+    	    self.body = fields[1][:-CRC_HEX_STR_SIZE]
+    	    self.footer = fields[1][-4]
+    	else:
+    		print("Data is NOT in conformance with protocol!")
+    	# Return a dictionary:
+    	return asdict(self)
+
+
+proto = ProtocolParser()
+parsed = proto.parse("PROTO.V4:dette er noe data\n7E8C")
+
+print(f"Header: {parsed.get('header')}")
+print(f"Body: {parsed.get('body')}")
+print(f"Footer: {parsed.get('footer')}")
+
+# Convert to JSON:
+parsed_as_json = json.dumps(parsed)
+print(parsed_as_json)
 ```
 
 
