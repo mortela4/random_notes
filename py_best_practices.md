@@ -408,7 +408,23 @@ Remember that '&', '|', '^' and '~' are BIT-WISE operators!
 
 ## Variables
 
-Do not use loop counter if it can be avoided. E.g:
+Remember that *everything* in Python is a **class**, even ints and floats!
+And, as the 'Zen of Python' dictates - explicit is better than implicit.
+It is therefore better to use:
+```python
+val = float(123)
+```
+than:
+```python
+val = 123
+```
+which ends up as an integer first, then e.g. val = val / 7 makes it (silently) end up as a float.
+
+### Temporary and intermediate variables (or, 'helper variables')
+Should be used at the very minimum!
+
+Do not use loop-counters or increment/decrement-variables in iterations if it can be avoided. 
+E.g:
 
 *No*
 
@@ -427,16 +443,86 @@ for i, word in enumerate(word_list):
     print(f"Word number {i} is '{word}'")
 ```
 
-## Iterators and Collections
-
-Prefer *direct* collection-object operations over loops. E.g:
+### Context Managers
+Use a context manager whenever you want to delimit usage of a resource in a 'logical' way.
+This is especially important when doing I/O, and it is mandatory to keep the OS or HW resource 
+opened only during the actual data commit or retrieval.
+E.g:
 ```python
-even_numbers = [x in range(20) if 0 == (x % 2)]
-
+with open(filename, 'w') as outfile:
+        for name, data in data_dict.items():
+            age = data['Age']
+            gender = data['Gender']
+            outfile.write(f"{name}, {age}, {gender}\n")
 print(f"{even_numbers}")
 ```
+Typical usage is file and database I/O.
 
- 
+
+## Iterators and Collections
+
+Python's built-in datatypes list, set, dict -
+as well as the popular (NumPy-)arrays, queue and fifo datatypes from libraries -
+are examples of *collections*.
+
+Iterating over them are straightforward and intuitive (maybe except from dict() datatype):
+```python
+a_simple_set = ('a', 'b', 'c')
+for ch in a_simple_set:
+    print(ch)
+```
+	
+Prefer *direct* collection-object operations over loops. 
+Especially for up-front generation of values.
+E.g:
+```python
+even_numbers = [x for x in range(20) if 0 == (x % 2)]
+odd_numbers = [x for x in range(20) if 1 == (x % 2)]
+
+print(even_numbers)
+print(odd_numbers)
+```
+Lots of examples available - just google 'python <collection object type> comprehensions' ...
+
+Note that collections can be derived from other collections. 
+E.g:
+```python
+a_list = range(1, 4)
+a_derived_set = set(a_list)
+for val in a_derived_set:
+    print(val)
+```
+
+### Dictionaries and its siblings 
+Dictionaries are a bit different from lists, (NumPy-)arrays, sets, queues and fifos -
+but still they are a collection of data, and can be iterated over.
+The simplest form of iteration will return **keys** only:
+```python
+my_dict = {'a': 1, 'b': 2, 'c': 3}
+for key in my_dict:
+    print(f"Dictionary key: {key}")  
+```
+	
+Often it is necessary to iterate over complete dictionary, and operate on both keys and values:
+dict()-type's built-in 'items()' method is used for retrieving a Key,Value-pair as a tuple() object.
+```python
+for key, value in my_dict.items():
+    print(f"Key = {key}, value = {value}")
+```
+
+The above iteration is intrinsically safe - as every element in an *existing* dictionary 
+is guaranteed to have both a key and value.
+However, when attempting to retrieve values using a key for which there is no guarantee 
+that exists in a given dictionary, one should use the 'get' method and check value - 
+*NOT* the '[<key>]' operator!
+E.g:
+
+*No*
+```python
+val = my_dict[my_key]	# Can throw 'KeyError'-exception --> must use try-except block!
+```
+
+
 ## Functions and Methods
 
 Return 'None' *explicitly* if arguments or internal data cannot compute valid result, 
@@ -445,6 +531,13 @@ Remember that any code-paths that returns nothing, will result in 'None' returne
 
 Else, throwing exception is acceptable. Caller site must be prepared for both cases!
 
+### Lambdas
+Special case of function, created with 'lambda' keyword, often referred to as 'anonymous function'.
+Can be useful for iterations with simple operations.
+E.g:
+```python
+
+```
 
 ### Arguments
 Use *named arguments*. E.g:
@@ -538,6 +631,44 @@ print(f"{cube(2, 3, 0, 'area')}")       # Prints '6'
 print(f"{cube(2, 3, 4, 'volume')}")     # Prints '24'
 print(f"{cube(2, 3, 0)}")               # Prints 'None'
 ```
+
+### Return Values
+Python can easily return multiple values from a function or method:
+```python
+def cube(width=0, length=0, height=0):
+    #
+    def area():
+        return width * length
+    def volume():
+        return height * area()
+    # 
+    return area(), volume() 
+
+area, volume = cube(2, 3, 4) 
+print(f"Cube area = {area}, and volume = {volume}")       
+```
+
+However, using a *named tuple* is better, 
+as it is harder to mix the returned values:
+```python
+from collections import namedtuple
+
+CubeReturnType = namedtuple("CubeReturnType", "area volume")
+
+def cube(width=0, length=0, height=0):
+    #
+    def area():
+        return width * length
+    def volume():
+        return height * area()
+    # 
+	ret_val = CubeReturnType(area=area(), volume=volume())
+    return ret_val
+
+results = cube(2, 3, 4) 
+print(f"Cube area = {results.area}, and volume = {results.volume}")       
+```
+
 
 ### Ordinary methods, class methods and staticmethods
 
