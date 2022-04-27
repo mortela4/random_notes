@@ -395,6 +395,17 @@ ___
 
 # Pythonic Code
 
+General rule is to follow PEP8 rules - 
+which are built into tools like PyCharm, Che/Theia and VSCode, 
+and used by linters/auto-formatters like Flake and Black.
+
+## Operators
+
+Use logic operators 'and', 'or' and 'not' in logic operations, never '+', '-' !!
+
+Remember that '&', '|', '^' and '~' are BIT-WISE operators!
+
+
 ## Variables
 
 Do not use loop counter if it can be avoided. E.g:
@@ -419,6 +430,13 @@ for i, word in enumerate(word_list):
 
 ## Functions and Methods
 
+Return 'None' *explicitly* if arguments or internal data cannot compute valid result, 
+**and** return value is allowed to be polyvalue.
+Remember that any code-paths that returns nothing, will result in 'None' returned anyway!
+
+Else, throwing exception is acceptable. Caller site must be prepared for both cases!
+
+
 ### Arguments
 Use *named arguments*. E.g:
 
@@ -437,9 +455,6 @@ linear_func(a, b, x)
 *Yes*
 
 ```python
-def linear_func(a, b, x):
-    return a*x + b
-
 x = 7
 a = 1.23
 b = 4.567
@@ -448,22 +463,82 @@ linear_func(a=a, b=b, x=x)
 
 Or, use a dataclass as argument:
 ```python
+from dataclasses import dataclass   # Part of standard library (Py=3.x)
+
 @dataclass
+class LinearFuncParams:
+    a: float
+    b: float
+    x: float
 
-
-x = 7
-a = 1.23
-b = 4.567
-linear_func(a=a, b=b, x=x)
+def linear_func(params: LinearFuncParams) -> float:
+    if params is not instanceof(LinearFuncParams):
+        throw ValueError
+    #
+    a = params.a
+    b = params.b
+    x = params.x
+    #
+    return a*x + b
+ 
+func_params = LinearFuncParams(a=1.23, b=4.567, x=7)
+linear_func(func_params)
 ```
+
+But - it is sometimes just as easy to use (data-)class itself:
+```python
+import numpy as np
+
+@dataclass
+class LinearFunc:
+    a: float
+    b: float
+    x: float
+
+    def calculate(self) -> float:
+        return a*x + b
+ 
+lin_func = LinearFuncParams(a=1.23, b=4.567, x=np.linspace(0, 10, 0.1))
+result_array = lin_func.calculate()
+```
+
+But remember, apart from 'x', 'y' and 'z' - arguments (and variables) should **not** be single-character!
 
 
 ### Scoped Functions
 
+Example:
+```python
+def cube(width=0, length=0, height=0, op='none'):
+    #
+    def area():
+        return width * length
+    def volume():
+        return height * area()
+    # Logic:
+    if 'area' == op :
+        val = area()
+    elif 'volume' == op:
+        val = volume()
+    else:
+        val = None
+    return val 
+
+
+print(f"{cube(2, 3, 0, 'area')}")       # Prints '6'
+print(f"{cube(2, 3, 4, 'volume')}")     # Prints '24'
+print(f"{cube(2, 3, 0)}")               # Prints 'None'
+```
 
 ### Ordinary methods, class methods and staticmethods
 
 
+
 ## Classes
 
+*Always* use 'CamelCase' in class name! E.g. 'class MyClass:'
+
+Use 'dataclass' objects when only *class-internal* data is used, 
+and serialization/de-serialization of class instances is relevant.
+ 
 
