@@ -445,7 +445,7 @@ for i, word in enumerate(word_list):
 ```
 
 ### Context Managers
-Use a context manager whenever you want to delimit usage of a resource in a 'logical' way.
+Use a context manager whenever you want to restrict usage of a resource in a 'logical' way.
 This is especially important when doing I/O, and it is mandatory to keep the OS or HW resource 
 opened only during the actual data commit or retrieval.
 E.g:
@@ -530,14 +530,6 @@ Remember that any code-paths that returns nothing, will result in 'None' returne
 
 Else, throwing exception is acceptable. Caller site must be prepared for both cases!
 
-### Lambdas
-Special case of function, created with 'lambda' keyword, often referred to as 'anonymous function'.
-Can be useful for iterations with simple operations.
-E.g:
-```python
-
-```
-
 ### Arguments
 Use *named arguments*. E.g:
 
@@ -607,7 +599,8 @@ But remember, apart from 'x', 'y' and 'z' - arguments (and variables) should **n
 
 
 ### Scoped Functions
-
+If a function is used in one, single other function - 
+it can be embedded within the calling function itself.
 Example:
 ```python
 def cube(width=0, length=0, height=0, op='none'):
@@ -630,6 +623,8 @@ print(f"{cube(2, 3, 0, 'area')}")       # Prints '6'
 print(f"{cube(2, 3, 4, 'volume')}")     # Prints '24'
 print(f"{cube(2, 3, 0)}")               # Prints 'None'
 ```
+Typically, this is mostly relevant when the scoped function is used multiple times within another function.
+
 
 ### Return Values
 Python can easily return multiple values from a function or method:
@@ -666,6 +661,30 @@ def cube(width=0, length=0, height=0):
 
 results = cube(2, 3, 4) 
 print(f"Cube area = {results.area}, and volume = {results.volume}")       
+```
+
+### Lambdas
+Special case of function, created with 'lambda' keyword, often referred to as 'anonymous function'.
+Can be useful for SWITCH-CASE type constructs, and iterations with simple operations.
+E.g:
+```python
+def cube(width=0, length=0, height=0, op='none'):
+	# Functions:
+	area = lambda w, l: w * l
+	volume = lambda w, l, h: w * l * h
+	# Logic:
+    if 'area' == op :
+        val = area(width, length)
+    elif 'volume' == op:
+        val = volume(width, length, height)
+    else:
+        val = None
+    return val 
+
+
+print(f"{cube(2, 3, 0, 'area')}")       # Prints '6'
+print(f"{cube(2, 3, 4, 'volume')}")     # Prints '24'
+print(f"{cube(2, 3, 0)}")               # Prints 'None'
 ```
 
 
