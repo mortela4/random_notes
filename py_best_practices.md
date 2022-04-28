@@ -5,13 +5,26 @@ ___
 
 ## In General
 
-### Values
+### Project Structure (opinionated)
+Remember that first rule is to ensure that project can be picked up by other developer(s) 
+with no prior knowledge of project. This depends heavily on good documentation, 
+and (preferrably) automated CI/CD operations. If the latter is *not* in place, 
+an option is to document carefully the manual steps involved, with description of all dependencies (or, 'assumptions').
+ 
+Use a descriptive project name, and have a README(.md) under top-level directory 
+with extensive description. Folder structure should be (but not 'shall' ...):
+- "src" folder for code, multiple sub-folders below this (w. descriptive names) if complex project with several layers or similar
+- "tests" folder for unit-tests
+- "docs" for documentation, including auto-docs built with Sphinx, PDoc, Doxygen etc.
 
-- "Build tools for others that you want to be built for you." - Kenneth Reitz
-- "Simplicity is alway better than functionality." - Pieter Hintjens
-- "Fit the 90% use-case. Ignore the nay sayers." - Kenneth Reitz
-- "Beautiful is better than ugly." - [PEP 20][]
-- Build for open source (even for closed source projects).
+Optional folders:
+- "build" for buildout-scripts, Makefiles, Ansible-config etc.etc. (especially important for mixed Python and C/C++ projects)
+- "deploy" for deployment-scripts (e.g. bash, powerShell, or Python) and (if relevant) Dockerfiles
+
+If no factual 'build'-step is required, "build" folder can be skipped leaving only "deploy" of the two. 
+Likewise, if the project represents a package (to be e.g. installed via 'python -m pip <package name>'), 
+the "deploy" folder may be redundant.
+
 
 ### General Development Guidelines
 
@@ -212,7 +225,7 @@ When you do write comments, remember: "Strunk and White apply." - [PEP 8][]
 
 Don't stress over it. 80-100 characters is fine.
 
-Use parentheses for line continuations.
+Use parentheses for line continuations (unless raw strings used).
 
 ```python
 wiki = (
@@ -222,6 +235,8 @@ wiki = (
     "same year as Smith & Wesson's M29 .44 Magnum."
 )
 ```
+Note the complementary use of ' and " here. 
+
 
 ### Testing
 
@@ -401,14 +416,32 @@ and used by linters/auto-formatters like Flake and Black.
 
 ## Strings
 Use F-strings consistently. There are very few exceptions to this rule ...
-(unless you must use Python2.7 ...)
+(unless it is *required* to use Python2.7 ...)
 
-Use UTF-8 unless working with ASCII-based protocols.
-(although 7-bit ASCII maps directly into UTF-8 ...)
+Use UTF-8 unless working with ASCII-based protocols
+(although 7-bit ASCII maps directly into UTF-8 ...).
+Ensure editor/IDE is set up to use UTF-8.
+**Note**: The '# -*- coding: latin-1 -*-' directive (or similar) is no longer relevant.
 
-Use raw strings for multi-line strings and JSON-data 
+Use raw strings for multi-line strings (*without* '\n') and JSON-data 
 (or whatever data that use characters that otherwise would have to be escaped).
 E.g.
+```python
+tst = r"""Dette
+er 
+en 
+test ...
+sjekk C:\Users\MortenL\Documents\python_best_practices"""
+
+print(tst)
+
+json_data = r"""{
+    "my_key_a": 123,
+    "my_key_b": "7Sense AS"
+}"""
+
+print(json_data)
+```
 
 
 ## Operators
@@ -495,6 +528,23 @@ for ch in a_simple_set:
     print(ch)
 ```
 
+Never use '[]'-type (i.e. 'indexed') access to collections, unless no other options exists!
+Use built-in functions (like 'zip()', 'sum()' etc.) or collection-type's member functions 
+(e.g. 'append()', 'sort()' etc.)
+
+Example:
+```python
+tst = [11, 2, 3, 7, 4, 8]
+tst.sort()
+print(f"{tst}")
+print(f"{sum(tst)}")
+```
+
+A notable exception may be string 'split()' method, given that number of elements in returned list 
+is checked before doing 'sub_string = splitted[index]' type assignments.
+Libraries exist for this type of operations, especially structured text like CSV, XML etc.
+
+
 ### Collection Comprehensions	
 Prefer *direct* collection-object operations over loops. 
 Especially for up-front generation of values.
@@ -518,6 +568,35 @@ for val in a_derived_set:
 ```
 But, beware of side-effects! Also note that it results in a relatively costly (deep) copy of data. 
 Changing the list above, does not affect the derived set.
+
+
+### Collection Generators
+The 'yield' keyword implies recursion.
+This can accumulate a lot of data on stack, and - especially on small systems - eat up all available RAM.
+Don't use it on small systems unless you *know* what you are up to!
+However, for relatively moderate data-ranges where multiple values are generated (e.g. tuples), 
+generators may be useful:
+```python
+def value_from_bits(num_bits: int = 0) -> int:
+    """ Calculate max value for given number of bits in range 1-num_bits """
+    bit_num = 0
+    val = 2
+    while num_bits > bit_num:
+        bit_num = bit_num + 1
+        # Accumulate value in collection = list-of-tuples:
+        yield bit_num, val
+        # Update value:
+        val = 2 * val
+
+values = value_from_bits(8)
+
+for bit_no, val in values:
+    print(f"A {bit_no}-bit word can represent a maximum value of {val}")
+```        
+        
+As it is a stateful technique, it is important to keep in mind that arguments to generator functions 
+remains the same for each iteration, it is just the function's *internal* variables that change.
+
 
 ### Dictionaries and its siblings 
 Dictionaries are a bit different from lists, (NumPy-)arrays, sets, queues and fifos -
@@ -769,7 +848,7 @@ class MyTestClass:
 
     def print_props_properly(self):
         for key in self.attr_map.keys():
-            print(f"'{key}' = { getattr(self, self.attr_map[key])}")
+            print(f"'{key}' = { getattr(self, self.attr_map.get(key))}")
 
     def set_props_fromdict(self, prop_set: dict):
         attr_setter = {
@@ -839,6 +918,12 @@ This is useful to avoid misunderstandings and mis-use of module.
 The number of Python packages are endless.
 This section barely scratches the surface, 
 only giving advice for general usage - or pointing to the most used ones.
+See also:
+https://awesome-python.com/
+
+
+### Prefer use of Standard Library over external packages
+Use the SL to the full extent, use external packages only when you have *very specific requirements*.
 
 ### Prefer cross-platform, 'native' packages
 If multiple choices exist w. regard to packages for a given functionality, 
@@ -863,9 +948,12 @@ e.g. making code sections platform-dependent:
 import platform
 
 if __name__ == "__main__":
-    if platform
-    print("This module is supposed to be run from 'main' module - no standalone execution facilitated!")
-    sys.exit(1)
+    # Application can only run on ARM-platform.
+    if platform.machine() in ["aarch64", "arm"]:
+    	do_hw_dependent_stuff()
+    else:
+    	print(f"FATAL: 
+    	sys.exit(1)
 ``` 	
 
 ### Common Utilities
