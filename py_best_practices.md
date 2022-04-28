@@ -18,6 +18,8 @@ with extensive description. Folder structure should be (but not 'shall' ...):
 - "docs" for documentation, including auto-docs built with Sphinx, PDoc, Doxygen etc.
 
 Optional folders:
+- "assets" for non-code items that are *required* by application, e.g. icons, tokenfiles, datafiles etc.
+- "config" folder may be relevant, especially if multiple run-time configurations apply 
 - "build" for buildout-scripts, Makefiles, Ansible-config etc.etc. (especially important for mixed Python and C/C++ projects)
 - "deploy" for deployment-scripts (e.g. bash, powerShell, or Python) and (if relevant) Dockerfiles
 
@@ -1037,6 +1039,10 @@ Therefore, use a configuration file format that is either obvious (like a Python
 or use a 'standard' format like JSON, YAML, XML etc. with built-in parsers or good Python-support from external packages. 
 
 NOTE: JSON is preferred, as it is widely used, (relatively) readable, supports hierarchy and can easily be used over webservices.
+
+Session-configs on a per-user basis is typically based on $HOME or %UserData% environment variables or similar.
+Server configs (on Linux/UNIX) are often stored somewhere below "/etc", but applications should offer alternatives 
+(like a command-line argument) to allow simplified testing (i.e. application *not* run by 'systemd' or similar).
 
 
 ### Handle Signals
