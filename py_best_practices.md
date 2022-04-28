@@ -41,7 +41,7 @@ the "deploy" folder may be redundant.
 
 ### Style
 
-Follow [PEP 8][], when sensible.
+Follow [PEP 8][], when sensible (which is ... always).
 
 #### Naming
 
@@ -280,7 +280,7 @@ import unittest
 class TestAUser(unittest.TestCase):
 
     def test_can_write_a_blog_post(self):
-        # Goes to the her dashboard
+        # Goes to the dashboard
         ...
         # Clicks "New Post"
         ...
@@ -414,14 +414,19 @@ General rule is to follow PEP8 rules -
 which are built into tools like PyCharm, Che/Theia and VSCode, 
 and used by linters/auto-formatters like Flake and Black.
 
-## Strings
-Use F-strings consistently. There are very few exceptions to this rule ...
-(unless it is *required* to use Python2.7 ...)
+## Strings (somewhat opinionated)
+Use F-strings consistently for string formatting. 
+There are very few exceptions to this rule ... (unless it is *required* to use Python2.7 ...).
 
 Use UTF-8 unless working with ASCII-based protocols
 (although 7-bit ASCII maps directly into UTF-8 ...).
 Ensure editor/IDE is set up to use UTF-8.
 **Note**: The '# -*- coding: latin-1 -*-' directive (or similar) is no longer relevant.
+
+Use double-quotes (") always, *NOT* single ('), unless it is meant to signify the use of a single character
+(but beware, it is still a string! my_char = 'c' is equivalent to my_char = str('c').
+Use triple double-quotes (""") around multi-line strings, and strings containing single or 
+double double-quotes( e.g."""Dette er en "rar" streng ...""") or single-quotes.
 
 Use raw strings for multi-line strings (*without* '\n') and JSON-data 
 (or whatever data that use characters that otherwise would have to be escaped).
@@ -447,7 +452,7 @@ print(json_data)
 ## Operators
 
 ### Logic Operators
-Use logic operators 'and', 'or' and 'not' in logic operations, never '+', '-' !!
+Use logic operators 'and', 'or' and 'not' in logic operations, NEVER arithmetic ones '+', '-' !!
 
 Remember that '&', '|', '^' and '~' are BIT-WISE operators!
 
@@ -880,8 +885,76 @@ the technique above can be utilized to modify objects via internal lookup using 
 
 ### Ordinary methods, class methods and staticmethods
 
+TODO ...
 
 
+### Decorators
+
+Use existing set of decorators from the standard library's modules, 
+or from external, utility packages. Do NOT re-invent the wheel!
+(or phone, or fax ...)
+
+However, for certain tasks you may need to implement your own.
+Example:
+```python
+def setInterval(interval):
+    """
+    Decorator which runs the decorated function periodically, 
+    and in a separate thread, with period='interval' value.
+    """
+    def decorator(function):
+        def wrapper(*args, **kwargs):
+            stopped = threading.Event()
+
+            def loop(): # executed in another thread
+                while not stopped.wait(interval): # until stopped
+                    function(*args, **kwargs)
+
+            t = threading.Thread(target=loop)
+            t.daemon = True # stop if the program exits
+            t.start()
+            return stopped
+        return wrapper
+    return decorator
+
+
+class BaseUnit(threading.Thread):
+    def __init__(self, mach_data: MachineRuntimeData = None, config = def_config, log = None, interval = 0.0, debug = False):
+        super().__init__()
+        # Argumented properties:
+        self.config = config
+        self.log = log
+        self.update_interval = interval
+        self.debug = debug
+        if mach_data:
+            self.mach_data = mach_data
+        else:
+            self.mach_data = MachineRuntimeData()
+        # Intrinsic properties:
+        self.base_data = BaseData()
+        self.timed_task = None
+        self.is_active = True
+    
+    def wrap_timed_task(self):
+        @setInterval(self.update_interval)
+        def update_presence(self):
+            log.debug("Updating presence ...")
+            api_post_data(api_endpoint=self.config.get_machine_presence_ep(), log=self.log, data=None, debug=self.debug, dry_run=True)
+        self.timed_task = update_presence(self)
+
+    def start_presence_update(self):
+        log.info("Machine usage started - updating presence ...")
+        if self.timed_task is None: 
+            self.wrap_timed_task()
+
+    def stop_presence_update(self):
+        log.info("Stopping PRESENCE update...")
+        self.timed_task.set()
+        self.timed_task = None
+        
+```
+
+    
 ## Classes
 
 *Always* use 'CamelCase' in class name! E.g. 'class MyClass:'
@@ -889,6 +962,42 @@ the technique above can be utilized to modify objects via internal lookup using 
 'dataclass' objects should be used when only *class-internal* data is used, 
 and serialization/de-serialization of class instances is relevant.
  
+Note that 'private'-like class members are prefixed with a *double* underscore, 
+but ***internally renamed*** with a underscore plus class-name to ensure access via 
+same name directly is not possible!
+E.g:
+```python
+class Testo:
+    def __init__(self):
+        self.__private_var = 123        # NOT accessible externally!
+        self._non_private_var = 678     # Accessible externally.  
+    def show(self):
+        print(f"__private_var = {self.__private_var}")
+    def show_aliased(self):
+        print(f"__private_var aliased = {self._Testo__private_var}")
+
+tst = Testo()
+
+tst.show()
+try:
+    tst.__private_var = 345     # Won't work ...
+except Exception:
+    pass
+
+setattr(tst, "__private_var", 666)
+tst.show()                                          # Prints 123
+print(f"""{getattr(tst, "__private_var")}""")       # Prints 666 --> a 'ghost' attribute has been created!
+
+tst.show_aliased()                     # ???
+
+setattr(tst, "_Testo__private_var", 345)
+print(f"""{getattr(tst, "_Testo__private_var")}""")     # Finally - this works!
+tst.show()
+
+tst._Testo__private_var = 999                           # And this too ...
+tst.show()
+```
+
 
 ## Modules
 
@@ -901,7 +1010,7 @@ via the 'set_props_fromdict()' method of the class:
 ```python
 if __name__ == "__main__":
     # Insert code for stand-alone execution, or module functional test here.
-	<... code ...>
+    <... code ...>
 ```
 
 This can be used even when the module is **NOT** supposed to be run stand-alone:
@@ -913,17 +1022,141 @@ if __name__ == "__main__":
 This is useful to avoid misunderstandings and mis-use of module.
 
 
+## Program Structure (also opinionated)
+
+### Use a Configuration File
+
+Always use a configuration file if 
+- the number of *mandatory* command-line arguments have exceeded 7 (yes, seven ...)
+- application settings are to be stored between sessions
+- application run-time configuration is dynamic, and can optionally be set remotely (via webservice etc.)
+- application is to be run as a server/daemon
+
+Use 'whatever' format that suits you - just DON'T RE-INVENT THE FAX!
+Therefore, use a configuration file format that is either obvious (like a Python-module with a Config-(data)class), 
+or use a 'standard' format like JSON, YAML, XML etc. with built-in parsers or good Python-support from external packages. 
+
+NOTE: JSON is preferred, as it is widely used, (relatively) readable, supports hierarchy and can easily be used over webservices.
+
+
+### Handle Signals
+
+Always install signal-handlers to ensure CLI-applications and server-applications can shut down gracefully!
+Typically, this is achieved 
+- either directly, by calling 'exit()' 
+Example (a complex one ...):
+```python
+# Signal Handlers:
+def panic_signal_handler(signal, frame):
+    global run_flag
+    warning("******** KILLING BASE UNIT PROCESS! (CTRL-Z received) ********\n")
+    sys.exit(1)
+
+def stop_signal_handler(signal, frame):
+    global run_flag
+    info("******** STOPPING BASE UNIT PROCESS ********\n")
+    run_flag = False
+
+def restart_signal_handler(signal, frame):
+    warning("***************** Attempting ReSTART of application!! **********************")
+    os.execv(sys.executable, ['python'] + sys.argv)   
+
+def reboot_signal_handler(signal, frame):
+    global run_flag
+    global watchdog_start_on_exit_flag
+    warning("***************** Attempting ReBOOT of entire system (i.e. OS reboots)!! **********************")
+    run_flag = False                       # To stop the application first ...
+    watchdog_start_on_exit_flag = True     # ... then, to flag watchdog should be started on app exit!
+
+
+if __name__ == "__main__":
+    host_platform_name = platform.machine()
+
+    # No point in remote-debug if host=devhost(=x86):
+    if app_config.get_remotedebug_config() and platform.machine() in ["aarch64", "arm"]:
+        import debugpy
+        # Std. remote-debug intro --> target hostname and port below must match debug-config settings (see: "launch.json") !
+        # ================================================================================================================== 
+        debugpy.listen(address = ('ccimx8x-sbc-pro.7sense.no', 3333))   # TODO: devhost(name or IP-address) and port should be specified in .INI-file!
+        print("Waiting for debugger attach")
+        debugpy.wait_for_client()
+        print("Attached!")
+        debugpy.breakpoint()
+        print(f"OS: {sys.platform}")    # Start from breakpoint here ...
+
+    # Handle Ctrl-C in console, or 'kill -5' (SIGINT) from other process, or 'kill -15' (SIGTERM) from other process:
+    signal.signal(signal.SIGINT, stop_signal_handler)
+    signal.signal(signal.SIGTERM, stop_signal_handler)
+    signal.signal(signal.SIGTSTP, stop_signal_handler)      # Ctrl-S --> signal(20). NOTE: SIGSTOP(signal(20)) cannot be caught!
+    signal.signal(signal.SIGQUIT, panic_signal_handler)      # Ctrl-Z --> signal(3) 
+
+    # Handle terminate-and-restart event:
+    signal.signal(signal.SIGUSR1, restart_signal_handler)    # NOTE: ignore 'problem'-warnings from VSCode when running on Windows rgd. missing 'SIGUSR1' member! (non-existent on non-POSIX)
+    # Handle terminate-and-reboot event:
+    signal.signal(signal.SIGUSR2, reboot_signal_handler)   # NOTE: ignore 'problem'-warnings from VSCode when running on Windows rgd. missing 'SIGUSR2' member! (non-existent on non-POSIX)
+
+    while run_flag:
+        if threads_alive_and_well(monitored_threads):
+            time.sleep(THREAD_ALIVE_CHECK_INTERVAL)
+        else:
+            break
+    
+    # Clean up (i.e. 'graceful' shutdown):
+    if mqttClient.is_alive():
+        # Invalidate 'machine'-field in MQTTclient class instance:
+        mqttClient.machine = None
+        mqttClient.join()
+        info("Terminated MQTT-client thread")
+    else:
+        warning("MQTTclient-thread not active - cannot join!")
+    if machine.is_alive():
+        machine.join()
+        info("Terminated machine-thread")
+    else:
+        warning("Machine-thread not active - cannot join!")
+    
+    info("Terminated all threads - exiting ...\n\n")
+
+    # Last Will & Testament - application AND (on target HW) system will be REBORN if reboot-flag set:
+    if watchdog_start_on_exit_flag:
+        if host_platform_name in ["aarch64", "arm"]:
+            status = os.system(WATCHDOG_START_CMD)                # NOTE: from here on, it will last N seconds (default N=15) before system reboots - no further sync'ing of open files etc!
+            if status == 0:
+                warning("Watchdog has been started - system will reboot in 15 seconds!")
+            else:
+                error("Failed to start watchdog - system will NOT be rebooted!")
+        else:
+            warning("System reboot is NO-OP on x86 devhost - restarting app via 'execv()' system call instead!")
+            os.execv(sys.executable, ['python3'] + sys.argv)
+    else:
+        sys.exit(0)
+        
+```
+
+In short, do *NOT* trust the system to do 'automatic release' of used resources, and cleanup of dangling file-pointers etc.
+CLI-applications should be able to terminate via Ctrl-C, and NOT relay on using 'kill -9 <PID>' or similar!
+
+
 ## Packages
 
 The number of Python packages are endless.
 This section barely scratches the surface, 
 only giving advice for general usage - or pointing to the most used ones.
 See also:
-https://awesome-python.com/
+[Awesome Python](https://awesome-python.com/)
 
 
 ### Prefer use of Standard Library over external packages
 Use the SL to the full extent, use external packages only when you have *very specific requirements*.
+E.g. the 'logging' module has lots of good alternatives, but you rarely need those unless you 
+work with frameworks that require them, or advocate the use of such.
+
+Note that many external packages have made it into the SL, either because they were 'de-facto' 
+standard, or were the first to offer dearly needed functionality.
+Installing external packages will anyway 'pollute' your Python installation - 
+at least if you install them with 'sudo' on Linux ...
+(therefore, use only 'python -m pip install <packagename>' for development).
+
 
 ### Prefer cross-platform, 'native' packages
 If multiple choices exist w. regard to packages for a given functionality, 
@@ -952,11 +1185,110 @@ if __name__ == "__main__":
     if platform.machine() in ["aarch64", "arm"]:
     	do_hw_dependent_stuff()
     else:
-    	print(f"FATAL: 
+    	print(f"FATAL: cannot execute application on machine={platform.machine()}!! Bailing out ...")
     	sys.exit(1)
-``` 	
+```
+
+For managing and monitoring process execution, the 'psutil' package is recommended. 
+
 
 ### Common Utilities
-- 'filesystem' package for file and folder manipulations
+- 'pathlib' package for file and folder manipulations
 - 'json' package for JSON manipulations (although good alternatives exist)
+
+### Web Utilities
+- 'requests' for HTTP requests --> lacks async requests support (may be fixed in recent versions?)
+- 'httpx' if you need async requests --> has a CLI available which is most useful (a la CURL)
+
+___
+
+
+# Development Tools Usage
+
+### Prototyping and POC-code
+
+Use the Python shell/terminal for simple experiments, instead of writing small, non-reuseable modules.
+Online REPL-tools (even incorporating debugger) can also be used, like [OnlineGDB](https://www.onlinegdb.com/)
+
+
+## Debug
+
+### Remote Debug
+
+This requires the debug server (or, 'agent') - typically based on 'pdb' debugmodule - to be installed on remote target.
+VSCode plays nicely 
+A hook-up point must be inserted in the code - immediately after top-level entry point 
+(typically 'if __name__ == "__main__":' line) - to start up the server and make it wait for a remote client connection.
+Example:
+```python
+if __name__ == "__main__":
+    host_platform_name = platform.machine()
+
+    # No point in remote-debug if host=devhost(=x86):
+    if app_config.get_remotedebug_config() and platform.machine() in ["aarch64", "arm"]:
+        import debugpy
+        # Std. remote-debug intro --> target hostname and port below must match debug-config settings (see: "launch.json") !
+        # ================================================================================================================== 
+        debugpy.listen(address = ('ccimx8x-sbc-pro.7sense.no', 3333))   # TODO: devhost(name or IP-address) and port should be specified in config-file!
+        print("Waiting for debugger attach")
+        debugpy.wait_for_client()
+        print("Attached!")
+        debugpy.breakpoint()
+        print(f"OS: {sys.platform}")    # Start from breakpoint here ...
+
+    <rest of your top-level module or script's code ...>
+    
+```
+
+In VSCode, remote debug client-access is set up in the "launch,json"-file (found under "/.vscode" folder in project) 
+in the following way:
+```json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Remote Attach",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "ccimx8x-sbc-pro",
+                "port": 3333
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/naeva_base/base_unit_firestore_client",
+                    "remoteRoot": "/usr/local/NAEVA/base_unit_firestore_client"
+                }
+            ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        }
+    ]
+}
+```
+
+The 'Python: Remote Attach' configuration sets up 
+- the remote-servers host-name(or, IP-address)
+- the TCP port-number
+- the mapping between source-location on devhost and where the (identical) Python-code is found on remote target
+
+The last item is ***very*** important in order to make debug work!
+It implies that Python code on both machines must be identical/in-sync, 
+which can be achieved in multiple ways (e.g. NFS-mount of devhost's source-dir).
+It is possible to set up a pre-debug step in VSCode (and other tools), 
+where source-dir is updated via 'rsync' or SSH.
+
+ 
+
+
+
+
 
