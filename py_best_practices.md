@@ -1,6 +1,35 @@
 # Python 'Best Practices'
 ___
 
+# Introduction
+
+Why Python?
+- Python is #1 most popular language (TIOBE ranking)
+- Python user community is VERY large, inclusive, diverse - in gender(s), industries and geographically - and very active! (see [PyCon](https://pycon.org) ) 
+- Python is used 'everywhere'
+- Libraries for 'everything' has been written in Python, and is typically globally accessible via [PyPi](https://pypi.org)
+- Python comes with 'batteries included' (a standard library covering most common tasks)
+- binding to C/C++ code is (relatively) easy in Python
+- Python is dynamically typed, and is object-oriented by design
+- Python is an interpreted language; easy to experiment and prototype - no compilation required!
+
+Why NOT Python???
+- Python is slow (compared to C/C++, Rust) - but, even scientific SW has been written in JavaScript ...
+- Python is dynamically typed, and is object-oriented by design (some holds this against Python ...)
+- Python is an interpreted language ...
+
+Python has become a general-purpose language on its own, 
+while complementing others as a scripting-overlay mechanism.
+It has successfully bridged programming/computer science and 
+other academic research and technical professions.
+
+Its use is at all 3 levels of the SW hierarchy:
+1) As a scripting solution only (e.g. in CAD/CAE/CAM), often replacing embedded scripting based on Tcl and Lisp-dialects, or custom/omain-specific languages
+2) As a middleware solution(e.g. YouTube has major parts written in Python), or framework integrating components in a low-level language (e.g. PyQt)
+3) As a language to implement complete applications (although these might bind to C/C++ libraries for low-level I/O and/or performance) 
+The last category includes projects like DropBox, and numerous web-frameworks like Django, Flask and FastAPI.
+
+
 # Python core language usage
 
 ## In General
