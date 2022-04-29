@@ -43,7 +43,7 @@ the "deploy" folder may be redundant.
 
 ### Style
 
-Follow [PEP 8][], when sensible (which is ... always).
+Follow [PEP 8](https://peps.python.org/pep-0008/#programming-recommendations), when sensible (which is ... always).
 
 #### Naming
 
@@ -1212,13 +1212,16 @@ If multiple choices exist w. regard to packages for a given functionality,
 use the one which is
 - cross-platform
 - OS-agnostic, so that API is uniform between platforms 
-- use direct bindings to native (C/C++ -)code, preferrably distributed with the package 
+- package project (or package vendor) offer bindings to multiple languages (e.g. C/C++, Rust, JavaScript, C#, Java, Go) in addition to Python
+- use direct bindings to native (C/C++ -)code, preferrably distributed with the package (not relying on naive loading of external DLLs)
+
 The last item means stay away from packages that loads external DLLs,
 or opens external applications if you have a choice ...
 
 A package like 'pyserial' is an example of a Python package that meet all requirements above, 
 and is the natural (or only ...) choice for any serial-port access whatever platform is in question (WinXX, Linux, MacOS, Android).
 
+A project developing a given Python package, that also  
 
 ### Cross-platform Utilities
 The built-in 'os' and 'sys' packages from the standard library are OK for simpler tasks.
@@ -1243,11 +1246,105 @@ For managing and monitoring process execution, the 'psutil' package is recommend
 
 ### Common Utilities
 - 'pathlib' package for file and folder manipulations
-- 'json' package for JSON manipulations (although good alternatives exist)
+- 'datetime' for *basic* date and time operations, while 'pendulum', 'arrow', and 'delorean' can be considered for complex manipulations! 
+- 'json' package for JSON manipulations (although lots of good alternatives exist)
+
+Example:
+```python
+import json
+
+json_data = r"""{"name": "distance", "unit": "meters", "value": 123}"""
+
+dict_from_json = json.loads(json_data)		# Produces a dictionary.
+
+print(dict_from_json)               		# This should LOOK like a dictionary (which it is) ...
+
+name = dict_from_json.get("name")
+unit = dict_from_json.get("unit")
+value = dict_from_json.get("value")
+json_field_values = (name, unit, value)
+
+if None not in json_field_values:
+    print(f"{name} in {unit}: {value}")
+else:
+    print("JSON data error - at least one field missing")   # NOTE: might be appropriate to thow exception after this ...
+```
+
 
 ### Web Utilities
 - 'requests' for HTTP requests --> lacks async requests support (may be fixed in recent versions?)
 - 'httpx' if you need async requests --> has a CLI available which is most useful (a la CURL)
+
+In terms of web-services frameworks, there is a long list which includes prominent projects like 
+- Django
+- Flask
+- FastAPI
+- TurboGears
+
+
+### Database Access
+- 'sqlalchemy', or libraries that bundles it. 
+This is a project which encompasses a lot of sub-projects for 
+all kinds of DB-tasks, like 'alembic' for DB-migrations.
+
+
+### Scientific Computing
+This is where 'Python is King' is *not* an overstatement!
+Python is the dominant language in
+- AI/ML(-pipelines)
+- VR/AR
+- Computer Graphics pipelines and composition (Blender, Maya +++)
+- Experimental Physics, e.g. robotics experimentation (ROS2 +++)
+- Experimental Chemistry and biomolecular research  
+
+For most generic, numerical computation tasks, NumPy is the go-to library.
+It is even bundled in many popular Python distributions (Anaconda, ScientificPython, PytonXYZ +++).
+It makes computations on vectors and matrices as simple as using scalars:
+```python
+import numpy as np
+
+
+def triple_it(values: float) -> float:
+    tripled = 3 * values            	# NumPy has overloads for all arithmetic operands relevant for vectors.
+    return tripled
+
+
+in_val = np.linspace(0, 10, 20)     # Yields 20 values, with distance = 10/20 = 0.5 between
+print(in_val)                       # Conceptually a list - but it's a vector ...
+
+result = triple_it(values=in_val)
+print(result)                       # Result is a vector too ...
+
+for val in result:
+    print(val)
+
+result = triple_it(values=1.23)     # Same function works for scalars also!
+print(result)
+for val in result:                  # But iteration will fail, as returned value is a scalar ...
+    print(val)
+```
+
+The excellent [SciPy](https://scipy.org/) package (or rather collection of packages) 
+is a superset of NumPy. It is most useful for complex transforms, and polynomial integration and derivation.
+
+[MatPlotLib](https://matplotlib.org/) is the obvious choice for scientific plotting, 
+but in recent years [Dash](https://plotly.com/dash/) has moved in - especially for web-based plots (i.e. 'dashboards').
+
+### HW Access
+- 'pyusb' for direct, low-level USB-access (cross-platform)
+- 'pyblue'(cross-platform) and 'pybluez'(Linux) for Bluetooth/BLE low-level access
+- 'pyserial' for serial ports (including virtual ones over e.g. USB) configguration and I/O 
+- 'mraa' for low-level, embedded I/O (SPI, I2C, GPIO) on a range of platforms (and languages), 
+with accompanying 'upm' library for a range of sensor-drivers. See [UPM project](https://upm.mraa.io/)
+
+Note that these packages are often not cross-platform, typically just supporting one, single OS/platform.
+This is due to HW-access being treated very differently on different platforms.
+
+### Networking
+TODO - if I care ... ;-)
+
+There are simply too many to mention, 
+and the standard library has a lot in place for e.g. simple TCP/UPD clients and servers.
 
 ___
 
