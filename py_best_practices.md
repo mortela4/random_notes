@@ -745,8 +745,29 @@ class LinearFunc:
 lin_func = LinearFuncParams(a=1.23, b=4.567, x=np.linspace(0, 10, 0.1))
 result_array = lin_func.calculate()
 ```
-
 But remember, apart from 'x', 'y' and 'z' - arguments (and variables) should **not** be single-character!
+
+Use *default argument values* for arguments that may be optional, or seldom have more than one, 'typical' value!
+
+*No*
+
+```python
+def activate(trace_activity):    # Need to supply argument value in every call.
+    if trace_activity:
+        print("ACTIVATING!")     # But we do NOT want to execute this code except during debug!
+    set_relays_on()
+    set_power_on()
+```
+
+*Yes*
+
+```python
+def activate(trace_activity: bool = False):
+    if trace_activity:
+        print("ACTIVATING!")
+    set_relays_on()
+    set_power_on()
+```
 
 
 ### Scoped Functions
@@ -794,7 +815,7 @@ print(f"Cube area = {area}, and volume = {volume}")
 ```
 
 However, using a *named tuple* is better, 
-as it is harder to mix the returned values:
+as it is harder to mix up the returned values:
 ```python
 from collections import namedtuple
 
@@ -910,7 +931,7 @@ def setInterval(interval):
 
             def loop(): # executed in another thread
                 while not stopped.wait(interval): # until stopped
-                    function(*args, **kwargs)
+                    function(*args, **kwargs)     # standard way of wrapping functions
 
             t = threading.Thread(target=loop)
             t.daemon = True # stop if the program exits
@@ -938,7 +959,7 @@ class BaseUnit(threading.Thread):
         self.is_active = True
     
     def wrap_timed_task(self):
-        @setInterval(self.update_interval)
+        @setInterval(self.update_interval)      # Function 'update_presence()' is decorated with 'setInterval()' decorator.
         def update_presence(self):
             log.debug("Updating presence ...")
             api_post_data(api_endpoint=self.config.get_machine_presence_ep(), log=self.log, data=None, debug=self.debug, dry_run=True)
@@ -964,6 +985,7 @@ class BaseUnit(threading.Thread):
 'dataclass' objects should be used when only *class-internal* data is used, 
 and serialization/de-serialization of class instances is relevant.
  
+### Data Encapsulation in Classes
 Note that 'private'-like class members are prefixed with a *double* underscore, 
 but ***internally renamed*** with a underscore plus class-name to ensure access via 
 same name directly is not possible!
@@ -999,6 +1021,27 @@ tst.show()
 tst._Testo__private_var = 999                           # And this too ...
 tst.show()
 ```
+
+### Class Composition
+
+Python supports multiple inheritance and class polymorphism.
+Example:
+```python
+class A:
+    pass
+
+class B:
+    pass
+
+class C(A, B):
+    pass
+```
+
+Albeit sometimes very useful, this may give rise to a bunch of problems.
+As in other languages that supports multiple inheritance (like C++), 
+the general rule is to use composition instead, but dataclasses with 
+no logic may be an exception. 
+
 
 
 ## Modules
