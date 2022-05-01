@@ -387,9 +387,19 @@ For fast-track solutions, it bundles the following modules:
 - pyscaffold.templates --> for composing and load/store of templates(.template-files ends up as "setup.cfg") 
 
 
+### Yeoman
+[Yeoman](https://yeoman.io) is another language-agnostic tool for project-generation.
+Once again, it takes YAML for configuration.
+
+
 ### Other/standalone (not template-based)
+The use of these are typically based on checkout of the template-project from GitHub, 
+and then manual modification or running a setup-script afterwards (or both).
+Some examples:
 - https://github.com/Aaronontheweb/scaffold-py --> PyPi-packagename 'Scaffold' (simple fork of pyscaffold?)
 - https://github.com/s3rius/FastAPI-template --> Complete Py-package based on cookiecutter. Feature-rich; choice of API-accessmethod, database etc.
+- https://github.com/rednafi/fastapi-nano.git
+
 
 ## Generator Templates
 
@@ -419,6 +429,10 @@ Generic:
 
 ### Py-Scaffold based
 - https://github.com/SarthakJariwala/PyScaffold-Interactive
+
+
+### Yeoman-based
+- https://github.com/vutran1710/YeomanPywork
 
 
 ## NOTES
