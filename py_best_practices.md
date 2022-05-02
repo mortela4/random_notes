@@ -466,7 +466,7 @@ There are very few exceptions to this rule ... (unless it is *required* to use P
 Use UTF-8 unless working with ASCII-based protocols
 (although 7-bit ASCII maps directly into UTF-8 ...).
 Ensure editor/IDE is set up to use UTF-8.
-**Note**: The '# -*- coding: latin-1 -*-' directive (or similar) is no longer relevant.
+**Note**: The '# -*- coding: latin-1 -*-' directive (or similar) that used to be placed on top of .py-files is no longer relevant!
 
 Use double-quotes (") always, *NOT* single ('), unless it is meant to signify the use of a single character
 (but beware, it is still a string! my_char = 'c' is equivalent to my_char = str('c').
@@ -517,7 +517,7 @@ else:
 
 ## Variables
 
-Remember that *everything* in Python is a **class**, even ints and floats!
+Remember that *everything* in Python is a ***class***, even ints and floats!
 And, as the 'Zen of Python' dictates - explicit is better than implicit.
 It is therefore better to use:
 ```python
@@ -718,7 +718,7 @@ print(parsed_as_json)
 
 ## Functions and Methods
 
-Return 'None' *explicitly* if arguments or internal data cannot compute valid result, 
+Return 'None' *explicitly* if arguments or internal data (or both in combination) cannot compute valid result, 
 **and** return value is allowed to be polyvalue.
 Remember that any code-paths that returns nothing, will result in 'None' returned anyway!
 
@@ -1264,7 +1264,11 @@ or opens external applications if you have a choice ...
 A package like 'pyserial' is an example of a Python package that meet all requirements above, 
 and is the natural (or only ...) choice for any serial-port access whatever platform is in question (WinXX, Linux, MacOS, Android).
 
-A project developing a given Python package, that also  
+A project developing a given Python package, that also maintain bindings for other languages, 
+may be a better choice than a Python-only project with same functionality.
+This is simply because of added flexibility and multiple choices - 
+it can be relevant to move a project from Python to e.g. C/C++ because of more low-level control or higher performance required.
+
 
 ### Cross-platform Utilities
 The built-in 'os' and 'sys' packages from the standard library are OK for simpler tasks.
@@ -1405,8 +1409,11 @@ Online REPL-tools (even incorporating debugger) can also be used, like [OnlineGD
 ### Remote Debug
 
 This requires the debug server (or, 'agent') - typically based on 'pdb' debugmodule - to be installed on remote target.
-VSCode plays nicely 
-A hook-up point must be inserted in the code - immediately after top-level entry point 
+VSCode plays nicely with the 'debugpy' package, and offer a near-transparent debug connection over the 'standard' PDB protocol.
+
+The following modifications are required on target in order to support remote debug with VSCode debugger as client:
+- the 'debugpy' package must be installed on target 
+- A hook-up point must be inserted in the code - immediately after top-level entry point 
 (typically 'if __name__ == "__main__":' line) - to start up the server and make it wait for a remote client connection.
 Example:
 ```python
@@ -1433,9 +1440,6 @@ In VSCode, remote debug client-access is set up in the "launch,json"-file (found
 in the following way:
 ```json
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
