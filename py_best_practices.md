@@ -13,10 +13,15 @@ Why Python?
 - Python is dynamically typed, and is object-oriented by design
 - Python is an interpreted language; easy to experiment and prototype - no compilation required!
 
+Famous Quote: "Python is the answer! ... What was the question?"
+
 Why NOT Python???
 - Python is slow (compared to C/C++, Rust) - but, even scientific SW has been written in JavaScript ...
 - Python is dynamically typed, and is object-oriented by design (some holds this against Python ...)
 - Python is an interpreted language ...
+
+Famous Quote: “There are only two kinds of languages: the ones people complain about and the ones nobody uses.” - Bjarne Stroustrup
+
 
 Python has become a general-purpose language on its own, 
 while complementing others as a scripting-overlay mechanism.
@@ -25,7 +30,7 @@ other academic research and technical professions.
 
 Its use is at all 3 levels of the SW hierarchy:
 1) As a scripting solution only (e.g. in CAD/CAE/CAM), often replacing embedded scripting based on Tcl and Lisp-dialects, or custom/omain-specific languages
-2) As a middleware solution(e.g. YouTube has major parts written in Python), or framework integrating components in a low-level language (e.g. PyQt)
+2) As a middleware solution (e.g. YouTube has major parts written in Python), or framework integrating components in a low-level language (e.g. PyQt)
 3) As a language to implement complete applications (although these might bind to C/C++ libraries for low-level I/O and/or performance) 
 The last category includes projects like DropBox, and numerous web-frameworks like Django, Flask and FastAPI.
 
@@ -1320,6 +1325,7 @@ else:
 
 ### Web Utilities
 - 'requests' for HTTP requests --> lacks async requests support (may be fixed in recent versions?)
+- 'urllib3' is a good replacement, or complement (depends)
 - 'httpx' if you need async requests --> has a CLI available which is most useful (a la CURL)
 
 In terms of web-services frameworks, there is a long list which includes prominent projects like 
@@ -1480,7 +1486,61 @@ It is possible to set up a pre-debug step in VSCode (and other tools),
 where source-dir is updated via 'rsync' or SSH.
 
  
+# Closing Notes
 
+## Use Generic 'Best Practices'
+
+Use patterns and workflows that applies to *all* programming languages as 'best practices'!
+Those are:
+- a sound VCS system that allows distributed work and co-operation
+- integrated with a CI/CD system for complete 'develop-build-test-integrate-deploy' pipeline
+- continuous feedback from development (e.g. from CI/CD tool, or issue-tracker tool)
+- continuous feedback from production (e.g. logs via syslog-daemon, or higher-level monitoring tools like 'OpenTelemetry', Nagios etc.)
+
+
+## Follow DRY Principle
+
+**Do NOT Repeat Yourself!!!** 
+A one-off solution to a common problem, often encountered in many applications, is a wasted one!
+First, investigate if the standard library collection can offer a solution, then - 
+search the 'net for a library offering the required functionality. Only when you do *not* find 
+any other solution, consider making a library yourself. And - do make it into a library!
+If you probably need to use it later in some other project, the code should 
+- be made 'generic' and flexible, i.e. not tightly integrated with the application
+- be made fit for multiple use-cases
+- be made standalone
+- be equipped with documentation for use (as it might be picked up again much later ...)
+- be stored in a separate repository, or along with other modules in a 'utilities'-repository
+
+One example is retrying actions, e.g. re-establishing a connection to a server or similar a given number of times.
+This involves the typical pattern of executing an action in a loop, 
+breaking out if the action succeeds or taking some other action if the loop runs to completion (i.e. tries failed).
+Excellent libraries exist for this, where some takes a function as argument (or, is decorator thereof ...) along 
+with integer N for number of attempts. But in many scenarios, typical libraries involved have the same functionality built-in.
+Example:
+```python
+import urllib3
+
+from urllib3.util import Retry
+from urllib3.exceptions import MaxRetryError
+
+
+GET_ENDPOINT = "http://www.problemserver.com/maybe/responsive"
+NUM_RETRIES = 3							# Yes, very typical number ...
+
+
+http = urllib3.PoolManager()
+
+# Set up 'Retry' to raise an exception if HTTP-status returned NUM_RETRIES times is in the range 500-599 (covers multiple types of connection failures):
+retry = Retry(NUM_RETRIES, raise_on_status=True, status_forcelist=range(500, 600))
+
+try:
+    # If successful, 'result' will be usable as a GET-request object (HTTP status, header & body).
+    result = http.request("GET", GET_ENDPOINT, retries=retry)	
+except MaxRetryError as retry_err:
+    # Else, an exception is raised - and we can log error:
+    logger.error(f"GET-request to {GET_ENDPOINT} failed! Reason: {retry_err.reason}")
+```
 
 
 
