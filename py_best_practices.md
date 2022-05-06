@@ -1166,6 +1166,19 @@ is declared *statically* to be a pointer or a C++ reference (e.g. 'auto& secondV
 Furthermore, Python has no 'const' keyword/qualifier, and users must design their own types 
 to be 'Read-Only'.
 
+### Dynamic Code Execution
+
+The fact that Python is an interpreted language, where code is scanned for syntactical 
+correctness before bytecode is generated, and finally executed, gives it tremendous 
+flexibility when it comes to dynamical behaviour. It also opens up endless possibilities for 
+complex constructs and associated pitfalls. For example, a string can be taken as input 
+at run-time and dynamically evaluated and executed by the Python interpreter.
+This is a **massive, security-(black)hole**!!
+
+Take all kinds of precautions if user input is taken from console, sockets or other external sources!
+A typical example is a remote console for a complex application or framework 
+that offers python sripting with access to application's internal data for convenience.
+Such a console would have to be secured by all means (password(s), SSO-tokens etc.etc.).
    
 ### Use Type Hints
 'Type hints' in python is a relatively new addition to the language (since Python3.5).
@@ -1226,6 +1239,62 @@ The takeawy from this section is that type hints *should* be used to a full exte
 to guide users of a function or method. Some tools, like Python linters, can do a 
 'semi-static type check' on Python code using these type hints, 
 which can rule out some subtle errors caused typically by misunderstandings.
+
+
+## Python Built-In Object Attributes
+
+The fact that Python is an interpreted language, where code is scanned for syntactical 
+correctness before bytecode is generated, and finally executed, is in particular exemplified by 
+its built-in attributes. As Python parses code and detects functions and classes, 
+it stores the object names along with type information. A global, hierarchical dictionary is built, 
+with object properties used as keys - like stringified object names.
+
+The use of Python's built-in attributes are immensively powerful, 
+but caution is adviced! One example is exactly the ```python__name__``` attribute:
+```python
+def a_function_safe():
+    pass
+
+def a_function_unsafe():
+    pass
+
+class SomeClass_safe(object):
+    def __init__(self):
+        self.__name__ = "I am safe"
+    def __call__(self):
+        print(f"This is a CLASS - executing {self.__name__}() does NOTHING!")
+    
+
+
+print(f"{a_function_safe.__name__}\n")
+
+def execute_safely(func: object = None, safe_ending: str = "safe") -> None:
+    func_name = func.__name__
+    print(f"Checking function '{func_name}' ...")
+    if func_name.endswith("safe"):
+        print(f"Function is SAFE - executing ...")
+        func()  # Calling a function (maybe NOT?)
+    else:
+        print(f"Function is UNSAFE - cannot execute!")
+
+
+execute_safely(a_function_safe)
+execute_safely(a_function_unsafe)
+
+possibly_safe_stuff = SomeClass_safe()
+
+execute_safely(SomeClass_safe)          # Passing a type --> the typename(-string) will be checked ...
+execute_safely(possibly_safe_stuff)     # Passing a class instance - the instance-name will be checked, 
+                                        # and trying to execute by <instance-name>() will crash - UNLESS '__call__()' method is defined!!
+```
+As can be seen from the example, a function can be mixed up with both a type(= a class-type here), 
+and also a class instance! String matching for object checking and comparisons is generally a bad idea - 
+as in **"don't use it if You don't mean it!"**. 
+
+If string-matching is anyway to be used, it must be complemented with some of the following:
+- type checking (i.e. function or type, or class instance, or ...)
+- additional attribute checking (i.e. if '__call_' attribute exists when object is class instance)
+- check if object is callable (for example above), via 'callable(<object>)' built-in function
 
 
 ## Modules
@@ -1705,6 +1774,8 @@ except MaxRetryError as retry_err:
     logger.error(f"GET-request to {GET_ENDPOINT} failed! Reason: {retry_err.reason}")
 ```
 
+Do also refrain from complex object checking where built-in functions can be used!
+E.g. 'iterable()' to check if looping over object is possible, 'callable()' to check if object can be directly executed etc.etc.
 
 
 
