@@ -1115,6 +1115,119 @@ class Person:
 ```
 
 
+## Dynamic Typing
+
+Python is said to be 'dynamically' typed. This implies that a variable gets its type *NOT* 
+from a typed declaration, but instead from an *assignment* (i.e. left-hand-side of '=' operator).
+
+There are 4 types of assignments in Python:
+- literal constant, e.g. 
+```python'
+my_var = 123
+```
+makes 'my_var' an integer (via deduction)
+- object copy assignment, e.g. when right-hand-side object is a non-mutable type 
+(Python's built-in primitive types int, float, str) e.g.
+```python
+my_var = 123
+another_var = my_var    # Copy assignment
+```
+- object reference assignment (explicit inheritance from right-hand-side object), 
+e.g. when right-hand-side object is non-mutable type (i.e. Python's collection-types, and most user-defined classes)
+```python
+my_var = [1, 2, 3, 4]
+second_var = my_var     # Reference assignment (i.e. 'assign-by-reference')
+
+second_var += [6, 7, 8, 9]
+
+print(second_var)   # Output: [1, 2, 3, 4, 6, 7, 8, 9]
+print(my_var)       # Output: [1, 2, 3, 4, 6, 7, 8, 9]
+
+
+if id(my_var) == id(second_var):
+    print(f"Both 'my_var' and 'second_var' has same object-ID = {id(my_var)} - it's the SAME object!")
+
+```
+This clearly shows 'my_var' and 'second_var' points to exactly same location in memory - 
+and objects are therefore equivalent as they have same type.
+- explicit object construction, e.g. when '<typename>()' is used, e.g.
+```python
+my_var = int(123)
+second_var = list()    # Explicit object construction
+another_var = []       # Same - also creates object of type 'list' 
+```
+
+The fact that assignment effectively decides the type of an object, 
+and assignments can mean either a copy of value or a copy of reference, 
+means that developers have to be on the alert for misunderstandings!
+E.g. in C and C++, the '=' operator does COPY-BY-VALUE unless left-hand-side object 
+is declared *statically* to be a pointer or a C++ reference (e.g. 'auto& secondVar = myVar;').
+
+Furthermore, Python has no 'const' keyword/qualifier, and users must design their own types 
+to be 'Read-Only'.
+
+   
+### Use Type Hints
+'Type hints' in python is a relatively new addition to the language (since Python3.5).
+It is both an aid to code understanding, and to Python-to-C/C++ (or Python-to-whatever) transpilers, 
+but has no implications (yet) on execution of code by gthe Python interpreter.
+
+The use of type hints is particularly important when a function or method accept polytype arguments, 
+and when working with classes with multiple levels of inheritance (i.e. class hierarchies).
+The type keyword **'any'** can be used to explicitly* mark a function argument as being any possible type.
+
+Example:
+```python
+def get_type_name(myvar: any = None, give_full_typename = True) -> str:
+    """ Prints the defined or deduced name of 'myvar's type. 'give_full_typename'=True yields e.g. <class 'int'>, else just 'int' """
+    if give_full_typename:
+        type_name = f"{type(myvar)}"
+    else:
+        type_name = f"{type(myvar).__name__}"""
+    return type_name
+
+
+def print_type_name(myvar: any = None, give_full_typename = False) -> None:
+    print (f"Type of 'myvar' variable is: {get_type_name(myvar)}")      
+
+
+print_type_name()        # Output: Type of 'myvar' variable is: <class 'NoneType'>
+print_type_name(123)     # Output: Type of 'myvar' variable is: <class 'int'>
+print_type_name("Yes!")  # Output: Type of 'myvar' variable is: <class 'str'>
+print_type_name(1.2345)  # Output: Type of 'myvar' variable is: <class 'float'> 
+
+class Omega(object):
+    pass
+
+testo = Omega()
+print_type_name(testo)   # Output: Type of 'myvar' variable is: <class '__main__.Omega'> if full name (i.e. includes superclass), else just 'Omega'
+
+
+def check_type(check_object: any = None, check_type: type = None) -> None:
+    if isinstance(check_object, check_type):
+        print(f"'check_object's type = {get_type_name(check_object)} is SAME as type '{check_type}'.")
+    else:
+        print(f"'check_object's type = {get_type_name(check_object)} is NOT the same as type '{check_type}'.")
+
+
+check_type(123, int)        # TRUE
+check_type(1.23, int)       # FALSE
+
+
+class Alpha(object):
+    pass
+
+alfa = Alpha()
+check_type(alfa, Alpha)     # TRUE
+check_type(alfa, Omega)     # FALSE
+```
+
+The takeawy from this section is that type hints *should* be used to a full extent, 
+to guide users of a function or method. Some tools, like Python linters, can do a 
+'semi-static type check' on Python code using these type hints, 
+which can rule out some subtle errors caused typically by misunderstandings.
+
+
 ## Modules
 
 ### Stand-alone, Functional Test of Modules
