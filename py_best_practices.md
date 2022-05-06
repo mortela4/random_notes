@@ -1250,7 +1250,7 @@ it stores the object names along with type information. A global, hierarchical d
 with object properties used as keys - like stringified object names.
 
 The use of Python's built-in attributes are immensively powerful, 
-but caution is adviced! One example is exactly the ```python__name__``` attribute:
+but caution is adviced! One example is exactly the ```__name__``` attribute:
 ```python
 def a_function_safe():
     pass
@@ -1263,7 +1263,8 @@ class SomeClass_safe(object):
         self.__name__ = "I am safe"
     def __call__(self):
         print(f"This is a CLASS - executing {self.__name__}() does NOTHING!")
-    
+    def method_is_safe(self):
+        print(f"Calling a method of a class IS fine ...")
 
 
 print(f"{a_function_safe.__name__}\n")
@@ -1275,7 +1276,7 @@ def execute_safely(func: object = None, safe_ending: str = "safe") -> None:
         print(f"Function is SAFE - executing ...")
         func()  # Calling a function (maybe NOT?)
     else:
-        print(f"Function is UNSAFE - cannot execute!")
+        print(f"Function (or method) is UNSAFE - cannot execute!")
 
 
 execute_safely(a_function_safe)
@@ -1286,13 +1287,15 @@ possibly_safe_stuff = SomeClass_safe()
 execute_safely(SomeClass_safe)          # Passing a type --> the typename(-string) will be checked ...
 execute_safely(possibly_safe_stuff)     # Passing a class instance - the instance-name will be checked, 
                                         # and trying to execute by <instance-name>() will crash - UNLESS '__call__()' method is defined!!
+                                        
+execute_safely(possibly_safe_stuff.method_is_safe)  # This is OK.
 ```
 As can be seen from the example, a function can be mixed up with both a type(= a class-type here), 
 and also a class instance! String matching for object checking and comparisons is generally a bad idea - 
 as in **"don't use it if You don't mean it!"**. 
 
 If string-matching is anyway to be used, it must be complemented with some of the following:
-- type checking (i.e. function or type, or class instance, or ...)
+- type checking (i.e. function or type, or class instance, or ...), possibly using the 'types' package from the standard library
 - additional attribute checking (i.e. if '__call_' attribute exists when object is class instance)
 - check if object is callable (for example above), via 'callable(<object>)' built-in function
 
