@@ -538,6 +538,8 @@ which ends up as an integer first, then e.g. val = val / 7 makes it (silently) e
 Should be used at the very minimum!
 
 Do not use loop-counters or increment/decrement-variables in iterations if it can be avoided. 
+Instead, get a element index using 'enumerate(<collection object>)' and create possible 
+loop-local variables from it.
 E.g:
 
 *No*
@@ -1325,6 +1327,20 @@ This is useful to avoid misunderstandings and mis-use of module.
 
 ## Program Structure (also opinionated)
 
+### Use Structured Logging
+
+Do *NOT* resort to 'print()'-type debugging/tracing for anything but the most trivial scripts!
+Instead, use structured, hierarchical logging facilities - preferrably from the 'logging' package 
+from the standard library. Quite a few 3.party packages are acceptable also - 
+but ensure they are *not* tied to a specific framework (e.g. like 'Django-logging').
+
+All decent logging frameworks have features like
+- thresholding (or log-level)
+- filtering (enable/disable per module, for example)
+- multiplexing and routing, e.g. ERROR and FATAL type messages can be sent to 'STDERR' while others go to 'STDOUT'
+- advanced formatting, with timestamp, type, module, thread name, function name, line number etc.etc. 
+
+
 ### Fail Early
 
 There is no 'single-point-of-return' preference in Python.
@@ -1376,17 +1392,19 @@ Server configs (on Linux/UNIX) are often stored somewhere below "/etc", but appl
 Always install signal-handlers to ensure CLI-applications and server-applications can shut down gracefully!
 Typically, this is achieved 
 - either directly, by calling 'exit()' 
+- or by setting a flag (like 'keep_running = False') that is regularly checked by application
+
 Example (a complex one ...):
 ```python
 # Signal Handlers:
 def panic_signal_handler(signal, frame):
     global run_flag
-    warning("******** KILLING BASE UNIT PROCESS! (CTRL-Z received) ********\n")
+    warning("******** KILLING SERVER APPLICATION! (CTRL-Z received) ********\n")
     sys.exit(1)
 
 def stop_signal_handler(signal, frame):
     global run_flag
-    info("******** STOPPING BASE UNIT PROCESS ********\n")
+    info("******** STOPPING SERVER APPLICATION ********\n")
     run_flag = False
 
 def restart_signal_handler(signal, frame):
@@ -1402,20 +1420,6 @@ def reboot_signal_handler(signal, frame):
 
 
 if __name__ == "__main__":
-    host_platform_name = platform.machine()
-
-    # No point in remote-debug if host=devhost(=x86):
-    if app_config.get_remotedebug_config() and platform.machine() in ["aarch64", "arm"]:
-        import debugpy
-        # Std. remote-debug intro --> target hostname and port below must match debug-config settings (see: "launch.json") !
-        # ================================================================================================================== 
-        debugpy.listen(address = ('ccimx8x-sbc-pro.7sense.no', 3333))   # TODO: devhost(name or IP-address) and port should be specified in .INI-file!
-        print("Waiting for debugger attach")
-        debugpy.wait_for_client()
-        print("Attached!")
-        debugpy.breakpoint()
-        print(f"OS: {sys.platform}")    # Start from breakpoint here ...
-
     # Handle Ctrl-C in console, or 'kill -5' (SIGINT) from other process, or 'kill -15' (SIGTERM) from other process:
     signal.signal(signal.SIGINT, stop_signal_handler)
     signal.signal(signal.SIGTERM, stop_signal_handler)
@@ -1658,15 +1662,20 @@ The following modifications are required on target in order to support remote de
 (typically 'if __name__ == "__main__":' line) - to start up the server and make it wait for a remote client connection.
 Example:
 ```python
+DEBUGHOST_LOCALNET_NAME = "my_embedded_target.mydomain.com"     # NOTE: this can be aquired by system-call(s) also!
+DEBUGPY_PORT_NUMBER = 3333                                      # Must be fixed - same on server and client.
+
+
 if __name__ == "__main__":
     host_platform_name = platform.machine()
 
-    # No point in remote-debug if host=devhost(=x86):
+    # No point in remote-debug if host=devhost(=x86) - meaning server=client:
     if app_config.get_remotedebug_config() and platform.machine() in ["aarch64", "arm"]:
+        # Only server-side (on embedded target where code is to be executed) take this code-block:
         import debugpy
         # Std. remote-debug intro --> target hostname and port below must match debug-config settings (see: "launch.json") !
         # ================================================================================================================== 
-        debugpy.listen(address = ('ccimx8x-sbc-pro.7sense.no', 3333))   # TODO: devhost(name or IP-address) and port should be specified in config-file!
+        debugpy.listen(address = (DEBUGHOST_LOCALNET_NAME, DEBUGPY_PORT_NUMBER))   # TODO: devhost(name or IP-address) and port should be specified in config-file!
         print("Waiting for debugger attach")
         debugpy.wait_for_client()
         print("Attached!")
@@ -1693,8 +1702,8 @@ in the following way:
             },
             "pathMappings": [
                 {
-                    "localRoot": "${workspaceFolder}/naeva_base/base_unit_firestore_client",
-                    "remoteRoot": "/usr/local/NAEVA/base_unit_firestore_client"
+                    "localRoot": "${workspaceFolder}/my_demo_app",
+                    "remoteRoot": "/usr/local/bin/my_demo_app"
                 }
             ]
         },
