@@ -910,6 +910,17 @@ print(f"{cube(2, 3, 0)}")               # Prints 'None'
 Note that both (references to) functions and lambdas can be stored in any 
 Python data-container class, like the built-in collections.
 
+However, lambdas are more flexible e.g. when used with a dictionary 
+for looking up a callable object from a string as key.
+You cannot have arguments to a function in a dict() except constants - 
+which means the function is evaluated and the return-value is used instead 
+of the function as dictionary value. I.e.
+```python
+map_cmd_to_function = { "on": set_on(intensity), "off": set_off() }  # Won't work ...
+
+map_cmd_to_function = { "on": (lambda intensity: set_on(intensity)), "off": set_off() }  # This works!
+```
+
 The example below maps a dictionary directly to class-properties 
 (or, 'members' - as C#/Java-type 'properties' is not built-in to Python)
 via the 'set_props_fromdict()' method of the class:
@@ -1089,7 +1100,19 @@ Albeit sometimes very useful, this may give rise to a bunch of problems.
 As in other languages that supports multiple inheritance (like C++), 
 the general rule is to use composition instead, but dataclasses with 
 no logic may be an exception. 
+Typical example:
+```python
+@dataclass
+class Person:
+    first_name: str
+    second_name: str
+    age: int
 
+@dataclass Customer:
+    person: Person
+    user_name: str
+    customer_id: int
+```
 
 
 ## Modules
@@ -1116,6 +1139,33 @@ This is useful to avoid misunderstandings and mis-use of module.
 
 
 ## Program Structure (also opinionated)
+
+### Fail Early
+
+There is no 'single-point-of-return' preference in Python.
+Instead, it is encouraged to fail early - 
+to enhance performance and maintain readability.
+Example:
+```python
+import logging
+
+COMMANDS = ["on", "off", "alarm", "shutdown"]
+
+log = logging.getLogger()
+
+def function_that_may_fail(cmd: str = None)
+    if str is None:
+        log.error("No command issued!")
+        return
+    if str not in COMMANDS:
+        log.error(f"Invalid command '{cmd}'!")
+    # Process command:
+    ...
+```
+Note that final 'return' at end of function is *implicit* in Python.
+It makes no difference to put a 'return' as last line in function, or not.
+In both cases, the function will return a 'None'-object.
+
 
 ### Use a Configuration File
 
