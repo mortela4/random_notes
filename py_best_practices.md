@@ -73,6 +73,7 @@ the "deploy" folder may be redundant.
 - Even more important that Test-Driven Development--*Human-Driven Development*
 - These guidelines may--and probably will--change.
 
+
 ## In Particular
 
 ### Style
@@ -280,8 +281,8 @@ Strive for 100% code coverage, but don't get obsess over the coverage score.
 
 #### General testing guidelines
 
-- Use long, descriptive names. This often obviates the need for doctrings in test methods.
-- Tests should be isolated. Don't interact with a real database or network. Use a separate test database that gets torn down or use mock objects.
+- Use long, descriptive names. This often obviates the need for docstrings in test methods.
+- Tests should be *isolated*. Don't interact with a real database or network. Use a separate test database that gets torn down or use mock objects.
 - Prefer [factories](https://github.com/rbarrois/factory_boy) to fixtures.
 - Never let incomplete tests pass, else you run the risk of forgetting about them. Instead, add a placeholder like `assert False, "TODO: finish me"`.
 
@@ -429,8 +430,8 @@ WebDev-focused:
 - https://github.com/jonatasoli/fastapi-template-cookiecutter
 
 Generic:
+- https://github.com/claws/cookiecutter-python-project --> setup for complete Python package ready for distribution/deployment
 - https://github.com/cjolowicz/cookiecutter-hypermodern-python --> with ALL bells & whistles ...
-
 
 ### Py-Scaffold based
 - https://github.com/SarthakJariwala/PyScaffold-Interactive
