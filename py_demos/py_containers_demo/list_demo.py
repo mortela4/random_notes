@@ -42,6 +42,13 @@ print(f"int_var = {int_var}")
 #
 float_var = float(next_last_element) if next_last_element.isnumeric() else 0    # Fails - must (unfortunately) use try-except for FLOATs as they are locale-dependent(decimal point) and take multiple formats(scientific notation etc.)
 print(f"float_var = {float_var}")                                               # Prints 0 ...
+#
+float_var = float(next_last_element) if next_last_element.replace('.', '').isdigit() else 0    # May work - but NOT for scientific notation!! (e.g. fstr = "1.2345E-6")
+print(f"float_var = {float_var}")     # prints '12.7' ...
+#
+test_sci_notation = "1.2345E-6"
+float_var = float(test_sci_notation) if test_sci_notation.replace('.', '').replace('-', '').replace('E', '').replace('e', '').isdigit() else 0    # MAY WORK - but lacks proper validation! (e.g. "--123.567-E6" will run 'float()' then trigger 'ValueError')
+print(f"float_var = {float_var}")      # Prints '1.2345e-06' --> both 'e' and 'E' are valid exponent-symbol in scientific notation! (which adds to the format problems ...)
 
 def is_float(val: str) -> bool:
     try:
@@ -50,13 +57,21 @@ def is_float(val: str) -> bool:
     except ValueError:
         return False
 
+print()
 float_var = float(next_last_element) if is_float(next_last_element) else 0 
 print(f"float_var = {float_var}")                                               # Prints 12,7 ...
 
+print()
 print(is_float("123,567"))     # False - my LOCALE language-input setting is "English(US)" ...
 print(is_float("123.567"))     # True
 print(is_float("1.23567E2"))   # True
 print(is_float("1,3567E2"))    # False
 
-
+# Slicing examples:
+print()
+s = "sunshine"
+print(s[1:5:2])
+print(s[1:5:1])
+print(s[0:5:1])
+print(s[0:5:1])
 
