@@ -1,4 +1,4 @@
-liston = [123, str("akkar"), 12.7, bytes('\x12', 'ascii'), None, bytearray("12.7", encoding='ascii'), bytearray("123", encoding='ascii')]
+liston = [123, str("123"), 12.7, bytes('\x12', 'ascii'), None, bytearray("12.7", encoding='ascii'), bytearray("123", encoding='ascii')]
 
 var1, var2, var3, var4 = liston[:4]         # Auto (=implicit) --> OBS: no of variables MUST match list-slice length!
 
@@ -52,4 +52,11 @@ def is_float(val: str) -> bool:
 
 float_var = float(next_last_element) if is_float(next_last_element) else 0 
 print(f"float_var = {float_var}")                                               # Prints 12,7 ...
+
+print(is_float("123,567"))     # False - my LOCALE language-input setting is "English(US)" ...
+print(is_float("123.567"))     # True
+print(is_float("1.23567E2"))   # True
+print(is_float("1,3567E2"))    # False
+
+
 
