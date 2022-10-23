@@ -1,5 +1,5 @@
-Random HW/SW notes README
-=========================
+# Random HW/SW notes README
+============================
 
 This repository contains random notes for HW/SW development.
 

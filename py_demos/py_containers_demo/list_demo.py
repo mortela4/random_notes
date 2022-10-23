@@ -8,6 +8,14 @@ print(f"var3 = {var3}")
 print(f"var4 = {var4}")
 print()
 
+int_var, _, float_var, *other_vars, byte_var = liston
+
+print(f"int_var = {int_var}")
+print(f"float_var = {float_var}")
+print(f"byte_var = {byte_var}")
+print(f"other_vars = {other_vars}")
+print()
+
 int_var = None
 str_var = None
 float_var = None
