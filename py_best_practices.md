@@ -95,7 +95,10 @@ Follow [PEP 8](https://peps.python.org/pep-0008/#programming-recommendations), w
 
 ###### General Naming Guidelines 
 
-Avoid one-letter variables (esp. `l`, `O`, `I`). 
+Python is an interpreted language, meaning short object names will make code execute faster 
+than with long object names. Still, readability should not be sacrificed.
+
+Avoid one-letter variables (esp. `l`, `O`, `I`), as they often create confusion. 
 
 *Exception*: In very short blocks, when the meaning is clearly visible from the immediate context
 
@@ -590,7 +593,7 @@ Never use '[]'-type (i.e. 'indexed') access to collections, unless no other opti
 Use built-in functions (like 'zip()', 'sum()' etc.) or collection-type's member functions 
 (e.g. 'append()', 'sort()' etc.)
 
-Example:
+Example using 'sort()':
 ```python
 tst = [11, 2, 3, 7, 4, 8]
 tst.sort()
@@ -598,9 +601,17 @@ print(f"{tst}")
 print(f"{sum(tst)}")
 ```
 
+Example using 'reversed()':
+```python
+tst = [11, 2, 3, 7, 4, 8]
+for i in reversed(tst):
+    print(f"{i}")
+```
+
 A notable exception may be string 'split()' method, given that number of elements in returned list 
 is checked before doing 'sub_string = splitted[index]' type assignments.
 Libraries exist for this type of operations, especially structured text like CSV, XML etc.
+
 
 
 ### Collection Comprehensions	
@@ -1789,6 +1800,14 @@ except MaxRetryError as retry_err:
 
 Do also refrain from complex object checking where built-in functions can be used!
 E.g. 'iterable()' to check if looping over object is possible, 'callable()' to check if object can be directly executed etc.etc.
+
+
+# Security Guidelines
+
+All language-agnostic guidelines apply (e.g. CERT). 
+Multiple organizations are involved in maintaining both recommendations and standards.
+Several sites are dedicated to keep updated guidelines, some of which are:
+- https://docs.fedoraproject.org/en-US/defensive-coding/programming-languages/Python/
 
 
 
