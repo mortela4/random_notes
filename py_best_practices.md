@@ -696,6 +696,16 @@ E.g:
 val = my_dict[my_key]	# Can throw 'KeyError'-exception --> must use try-except block!
 ```
 
+*Yes*
+```python
+val = my_dict.get(my_key)	# Can't throw ... (but, 'val' may be assigned to 'None')
+if val:
+    use_dict_val(val)
+else:
+    log_invalid_key_error(my_key)
+```
+
+
 Note that dataclasses can be directly converted to dictionaries via 'asdict()' function. 
 E.g.
 ```python
@@ -1749,7 +1759,8 @@ where source-dir is updated via 'rsync' or SSH.
 Use patterns and workflows that applies to *all* programming languages as 'best practices'!
 Those are:
 - a sound VCS system that allows distributed work and co-operation
-- integrated with a CI/CD system for complete 'develop-build-test-integrate-deploy' pipeline
+- integrated with a CI/CD system for complete 'develop-build-test-integrate-deploy' pipeline; 
+  including hooks to run unit-tests (if existing) on every commit (or, at least every push-to-repo if using Git)
 - continuous feedback from development (e.g. from CI/CD tool, or issue-tracker tool)
 - continuous feedback from production (e.g. logs via syslog-daemon, or higher-level monitoring tools like 'OpenTelemetry', Nagios etc.)
 
