@@ -5,7 +5,10 @@
 ```
 find . -name "*.bak" -type f
 ```
-
+Find and count lines in all (Python-)files below working path:
+```
+find . -name "*.py" -type f -exec wc -l {} \;
+```
 
 ## Delete them:
 ```
