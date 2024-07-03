@@ -13,7 +13,7 @@ find . -name "*.bak" -type f -delete
 ```
 Or, delete only lines in them files starting with '#endif':
 ```
-find . -name "*.c" -exec sed -i "/^#endif/d" {} \;
+find . -name "*.c" -exec sed -i "/#endif/d" {} \;
 ```
 
 
