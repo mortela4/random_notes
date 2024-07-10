@@ -64,7 +64,8 @@ with the one shown below as a working template:
 		    "openOCDPreConfigLaunchCommands": ["set ESP_RTOS none"],
 		    "serverpath": "<PATH to OpenOCD binary for ESP32 from ESP-IDF>/openocd",
 		    "showDevDebugOutput": "raw",
-		    "configFiles": ["board/esp32<variant>-builtin.cfg"], 
+		    "configFiles": ["board/esp32<variant>-builtin.cfg"],  // If the built-in USB-to-JTAG debug connection (found on devkits) is used! 
+		    // Else, custom config combined w. "target/esp32<variant>.cfg" may be required (using J-Link, FTDI-based adapter or 'whatever').
 		    "overrideAttachCommands": [
 		      "set remote hardware-watchpoint-limit 2",
 		      "mon halt",
