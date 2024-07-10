@@ -44,71 +44,79 @@ This includes 'OpenOCD' which has a GDBserver-compliant backend, and can be used
 connection found on most (recent) ESP32 kits. 
 
 A working "launch.json" must be crafted manually for debug - 
-with the one shown below as a working example:
+with the one shown below as a working template:
 ```
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            // more info at: https://github.com/Marus/cortex-debug/blob/master/package.json
-            "name": "Zephyr IDE: Debug",
-            "type": "cortex-debug",
-            "request": "attach", // launch will fail when attempting to download the app into the target
-            "cwd": "${workspaceRoot}/button",
-            "executable": "${command:zephyr-ide.get-active-build-path}/zephyr/zephyr.elf", 
-            "servertype": "openocd",
-            "interface": "jtag",
-            "armToolchainPath": "/home/mortenl/.local/zephyr-sdk-0.16.8/xtensa-espressif_esp32s3_zephyr-elf/bin",
-            //"toolchainPrefix": "xtensa-esp32-elf", 
-            "toolchainPrefix": "xtensa-espressif_esp32s3_zephyr-elf", 
-            "openOCDPreConfigLaunchCommands": ["set ESP_RTOS none"],
-            //"serverpath": "/usr/bin/openocd", 
-            "serverpath": "/home/mortenl/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin/openocd",
-            "showDevDebugOutput": "raw",
-            //"gdbPath": "~/.espressif/tools/xtensa-esp-elf-gdb/14.2_20240403/xtensa-esp-elf-gdb/bin/xtensa-esp32-elf-gdb", 
-            //"gdbPath": "~/.local/zephyr-sdk-0.16.8/xtensa-espressif_esp32s3_zephyr-elf/bin/xtensa-espressif_esp32s3_zephyr-elf-gdb",
-            "configFiles": ["board/esp32s3-builtin.cfg"], 
-            "overrideAttachCommands": [
-              "set remote hardware-watchpoint-limit 2",
-              "mon halt",
-              "flushregs",
-              "set remotetimeout 20",
-              "-target-select extended-remote localhost:50000"
-            ],
-            "overrideRestartCommands": ["mon reset halt", "flushregs", "c"],
-        },
-        {
-            "type": "gdbtarget",
-            "name": "ESP32 Debug",
-            "cwd": "${workspaceFolder}/button",
-            "gdb": "~/.espressif/tools/xtensa-esp-elf-gdb/14.2_20240403/xtensa-esp-elf-gdb/bin/xtensa-esp32s3-elf-gdb",
-            "program": "${command:zephyr-ide.get-active-build-path}/zephyr/zephyr.elf",
-            "request": "launch",
-            //"debugServer": 3333,
-            "initCommands": [
-                "set remote hardware-watchpoint-limit 4",
-                "mon reset halt",
-                "maintenance flush register-cache",
-                "thb app_main"
-            ],
-            "target": 
-            {
-                "connectCommands": 
-                [
-                    "set remotetimeout 20",
-                    "-target-select extended-remote localhost:3333"
-                ]
-            },
-            "preLaunchTask": "~/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin/openocd -f ~/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts/board/esp32s3-builtin.cfg"
-        }
-    ]
-}
+	"version": "0.2.0",
+	"configurations": 
+	[
+		{
+		    // more info at: https://github.com/Marus/cortex-debug/blob/master/package.json
+		    "name": "Zephyr IDE: Debug",
+		    "type": "cortex-debug",
+		    "request": "attach", // do NOT use "launch" - will fail when attempting to download the app into the target!
+		    "cwd": "${workspaceRoot}/<project-name>",
+		    "executable": "${command:zephyr-ide.get-active-build-path}/zephyr/zephyr.elf",  // NOTE: should always be 'zephyr.elf'!!
+		    "servertype": "openocd",
+		    "interface": "jtag",
+		    "armToolchainPath": "<Zephyr SDK install-HOME>/zephyr-sdk-<version>/<ARCH>-espressif_esp32<variant>_zephyr-elf/bin",
+		    "toolchainPrefix": "<ARCH>-espressif_esp32<variant>_zephyr-elf", 
+		    "openOCDPreConfigLaunchCommands": ["set ESP_RTOS none"],
+		    "serverpath": "<PATH to OpenOCD binary for ESP32 from ESP-IDF>/openocd",
+		    "showDevDebugOutput": "raw",
+		    "configFiles": ["board/esp32<variant>-builtin.cfg"], 
+		    "overrideAttachCommands": [
+		      "set remote hardware-watchpoint-limit 2",
+		      "mon halt",
+		      "flushregs",
+		      "set remotetimeout 20",
+		      "-target-select extended-remote localhost:50000"	// NOTE: 'cortex-debug' launches OpenOCD server w. GDB-port(TCP)=50000 by default! (and TCL-port=50001, Telnet-port=50002)
+		    ],
+		    "overrideRestartCommands": ["mon reset halt", "flushregs", "c"],
+		}
+	]
+```
+Edit the text between angle brackets ('<>').
+
+
+On my (typical) system, referencing the toolchain within Zephyr SDK, 
+using ESP32-S3 (i.e. ARCH='xtensa' and variant='s3'),
+and OpenOCD for ESP32 from 'ESP-IDF' SDK, this becomes:
+```
+{
+	"version": "0.2.0",
+	"configurations": 
+	[
+		{
+		    // more info at: https://github.com/Marus/cortex-debug/blob/master/package.json
+		    "name": "Zephyr IDE: Debug",
+		    "type": "cortex-debug",
+		    "request": "attach", // do NOT use "launch" - will fail when attempting to download the app into the target!
+		    "cwd": "${workspaceRoot}/button",
+		    "executable": "${command:zephyr-ide.get-active-build-path}/zephyr/zephyr.elf", 
+		    "servertype": "openocd",
+		    "interface": "jtag",
+		    "armToolchainPath": "/home/mortenl/.local/zephyr-sdk-0.16.8/xtensa-espressif_esp32s3_zephyr-elf/bin",
+		    "toolchainPrefix": "xtensa-espressif_esp32s3_zephyr-elf", 
+		    "openOCDPreConfigLaunchCommands": ["set ESP_RTOS none"],
+		    "serverpath": "/home/mortenl/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin/openocd",
+		    "showDevDebugOutput": "raw",
+		    "configFiles": ["board/esp32s3-builtin.cfg"], 
+		    "overrideAttachCommands": [
+		      "set remote hardware-watchpoint-limit 2",
+		      "mon halt",
+		      "flushregs",
+		      "set remotetimeout 20",
+		      "-target-select extended-remote localhost:50000"	
+		    ],
+		    "overrideRestartCommands": ["mon reset halt", "flushregs", "c"],
+		}
+	]
 ```
 
-NOTE: the 'gdbtarget' debug-type configuration *should* work as well, but fails - probably because of tool-PATH specifications not being picked up correctly!
+NOTE: it is probably also OK to use 'vanilla' OpenOCD as long as all required .cfg-files are in place, 
+and also the GDB debugger from Xtensa-Espressif-ESP32 toolchain installed by ESP-IDF SDK installer (or ditto VScode IDF extension).
 
+ 
 
 
