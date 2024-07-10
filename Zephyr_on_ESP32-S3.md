@@ -66,6 +66,7 @@ with the one shown below as a working template:
 		    "showDevDebugOutput": "raw",
 		    "configFiles": ["board/esp32<variant>-builtin.cfg"],  // If the built-in USB-to-JTAG debug connection (found on devkits) is used! 
 		    // Else, custom config combined w. "target/esp32<variant>.cfg" may be required (using J-Link, FTDI-based adapter or 'whatever').
+		    // Typically, a 'generic' FTDI-adapter config is defined as "interface/ftdi/esp32_devkitj_v1.cfg".
 		    "overrideAttachCommands": [
 		      "set remote hardware-watchpoint-limit 2",
 		      "mon halt",
