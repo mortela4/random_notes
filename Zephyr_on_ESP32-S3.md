@@ -104,7 +104,7 @@ and OpenOCD for ESP32 from 'ESP-IDF' SDK, this becomes:
 		    "openOCDPreConfigLaunchCommands": ["set ESP_RTOS none"],
 		    "serverpath": "/home/mortenl/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin/openocd",
 		    "showDevDebugOutput": "raw",
-		    "configFiles": ["board/esp32s3-builtin.cfg"], 
+		    "configFiles": ["board/esp32s3-builtin.cfg"],   // NOTE: first parses and executes "interface/esp_usb_jtag.cfg", and then "target/esp32s3.cfg" (order is important)!
 		    "overrideAttachCommands": [
 		      "set remote hardware-watchpoint-limit 2",
 		      "mon halt",
