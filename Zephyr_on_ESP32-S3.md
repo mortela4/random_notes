@@ -121,5 +121,67 @@ NOTE: it is probably also OK to use 'vanilla' OpenOCD as long as all required .c
 and also the GDB debugger from Xtensa-Espressif-ESP32 toolchain installed by ESP-IDF SDK installer (or ditto VScode IDF extension).
 
  
+## PlatformIO and its VScode extension
 
+The following "platformio.json" configuration file works w. ESP32-S3-devkitM(-rev1):
+```
+[env:esp32-s3-devkitm-1]
+platform = espressif32
+framework = arduino
+board = esp32-s3-devkitm-1
+monitor_speed = 115200
+monitor_port = /dev/ttyUSB5
+; Ensure DTR does NOT pull "CHIP_PU"(=nRST)='0' !! (NOTE: DTR=RTS='0' should work also)
+monitor_dtr = 0
+monitor_rts = 1
+; Required to use UART0 as 'Serial0':
+build_flags = 
+	-DARDUINO_USB_CDC_ON_BOOT=1
+	-DARDUINO_USB_MODE=1
+```
+NOTE: to find the corresponding port for 'Serial0'(=UART0 of the ESP32-S3) via CP2102N USB-to-Serial adapter,
+run the following 'platformio' (sub-)command and check output:
+```
+$ ~/.platformio/penv/bin/platformio device list
+/dev/ttyS4
+----------
+Hardware ID: n/a
+Description: n/a
+
+/dev/ttyS0
+----------
+Hardware ID: PNP0501
+Description: ttyS0
+
+/dev/ttyUSB5
+------------
+Hardware ID: USB VID:PID=10C4:EA60 SER=2651ee1a5fd3eb11ac2b28e743d319e3 LOCATION=3-14.3
+Description: CP2102N USB to UART Bridge Controller
+
+/dev/ttyUSB0
+------------
+Hardware ID: USB VID:PID=0403:6001 SER=FT8BZ9X3 LOCATION=3-13
+Description: TTL232RG-VREG1V8 - TTL232RG-VREG1V8
+
+/dev/ttyACM0
+------------
+Hardware ID: USB VID:PID=303A:1001 SER=F4:12:FA:86:72:3C LOCATION=3-14.4:1.0
+Description: USB JTAG/serial debug unit
+
+```
+From this it can be seen that the debug interface (and the 'Serial' default interface if -DARDUINO_USB_CDC_ON_BOOT=0) is on "/dev/ttyACM0" device, 
+while the CP2102N (= adapter for the UART0 or 'Serial0' interface) connection is represented on "/dev/ttyUSB5" device.
+
+If output via calls to 'Serial.print(...)' or 'Serial.println(...)' is desired on monitor, 
+then monitor_port=<ttyCU(x) device>.
+
+If output via calls to 'Serial.print(...)' or 'Serial.println(...)' is desired on monitor, 
+then monitor_port=<ttyUSB(x) device>. Check if there might be other CP2102N-based USB-to-serial adapters connected to host, 
+and identify the correct one!
+
+NOTE: if flag -DARDUINO_USB_CDC_ON_BOOT=1 then the internal USB device-controller in the ESP32-S3 acts as CDC-device, 
+and the 'Serial' object will connect to this device!
+ 
+
+   
 
