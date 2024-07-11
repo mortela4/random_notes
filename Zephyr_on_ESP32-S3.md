@@ -64,6 +64,7 @@ with the one shown below as a working template:
 		    "openOCDPreConfigLaunchCommands": ["set ESP_RTOS none"],
 		    "serverpath": "<PATH to OpenOCD binary for ESP32 from ESP-IDF>/openocd",
 		    "showDevDebugOutput": "raw",
+		    "svdPath": "/home/mortenl/.espressif/svd/svd/esp32s3.svd",   // Cloned from 'github.com/espressif/svd' NOTE: may also use "${idf.svdFilePath}" (???)
 		    "configFiles": ["board/esp32<variant>-builtin.cfg"],  // If the built-in USB-to-JTAG debug connection (found on devkits) is used! 
 		    // Else, custom config combined w. "target/esp32<variant>.cfg" may be required (using J-Link, FTDI-based adapter or 'whatever').
 		    // Typically, a 'generic' FTDI-adapter config is defined as "interface/ftdi/esp32_devkitj_v1.cfg".
